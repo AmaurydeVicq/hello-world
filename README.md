@@ -1,2 +1,3 @@
 # hello-world
-This is an introductionay data repository
+Hello Humans, The Corona virus is serious shit, so be warned!
+All the best, Botbot!
