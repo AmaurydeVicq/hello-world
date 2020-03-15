@@ -25,6 +25,7 @@ library(tidyverse)
 library(fuzzyjoin)
 library(magrittr)
 library(lubridate)
+library(forecast)
 
 
 x <- c("ggmap", "rgdal", "rgeos", "maptools", "tmap")
@@ -80,6 +81,83 @@ PerCountry <- Alltogether %>%
   summarise(Confirmed = sum(Confirmed), 
             Deaths = sum(Deaths), 
             Recovered = sum(Recovered))
+
+# Toepassing TBATS op BE
+
+BEConfirmed <- subset(PerCountry, Country.Region == "Belgium", select = c("name", "Confirmed"))
+
+BEL30T <- BEConfirmed %>%
+select(2) %>%
+ts() %>%
+tbats() %>%
+forecast(h = 30)
+
+BEL60T <- BEConfirmed %>%
+select(2) %>%
+ts() %>%
+tbats() %>%
+forecast(h = 60)
+
+
+# Toepassing HOLT op BE (werkt niet)
+
+BEConfirmed <- subset(PerCountry, Country.Region == "Belgium", select = c("name", "Confirmed"))
+
+BEL30H <- BEConfirmed %>%
+select(2) %>%
+ts() %>%
+holt() %>%
+forecast(h = 30)
+
+BEL60H <- BEConfirmed %>%
+select(2) %>%
+ts() %>%
+holt() %>%
+forecast(h = 60)
+
+
+# Toepassing TBATS op NL
+
+NLConfirmed <- subset(PerCountry, Country.Region == "Netherlands", select = c("name", "Confirmed"))
+
+NL30 <- NLConfirmed %>%
+select(2) %>%
+ts() %>%
+tbats() %>%
+forecast(h = 30)
+
+NL60 <- NLConfirmed %>%
+select(2) %>%
+ts() %>%
+tbats() %>%
+forecast(h = 60)
+
+# Toepassing HOLT op NL (werk niet)
+
+NLConfirmed <- subset(PerCountry, Country.Region == "Netherlands", select = c("name", "Confirmed"))
+
+NL30 <- NLConfirmed %>%
+select(2) %>%
+ts() %>%
+holt() %>%
+forecast(h = 30)
+
+NL60 <- NLConfirmed %>%
+select(2) %>%
+ts() %>%
+holt() %>%
+forecast(h = 60)
+
+# Alles even plotten
+
+par(mfrow=c(2,2))
+plot(BEL30) 
+plot(BEL60) 
+plot(NL30) 
+plot(NL60) 
+
+
+
 ```
 
 Laten we eerst een map maken van de hele wereld op een specifieke datum, bijv. `r Sys.Date() -1`. 
