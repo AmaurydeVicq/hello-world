@@ -18,7 +18,7 @@ Hier gaan we werken aan de coronavirus database om te voorspellen. Eens even kij
 
 On va charger les packages!!!! 
 
-```{r include = FALSE, message = FALSE, warning = FALSE}
+```{r include = FALSE, message = FALSE, wSSarning = FALSE}
 library(readxl)
 library(rvest)
 library(tidyverse)
@@ -26,6 +26,7 @@ library(fuzzyjoin)
 library(magrittr)
 library(lubridate)
 library(forecast)
+library(minpack.lm)
 
 
 x <- c("ggmap", "rgdal", "rgeos", "maptools", "tmap")
@@ -81,6 +82,30 @@ PerCountry <- Alltogether %>%
   summarise(Confirmed = sum(Confirmed), 
             Deaths = sum(Deaths), 
             Recovered = sum(Recovered))
+
+# Toepassing SSasymy op CH
+CHConfirmed <- subset(PerCountry, Country.Region == "China", select = c("name", "Confirmed"))
+
+## Data variabele omzetten naar integer (werk niet met data)
+DaysPassed <- seq(1:53)
+CH <- cbind(CHConfirmed, DaysPassed)
+CH <- select(CH,2:3)              
+
+## Model toepassen en plotten 
+###1 Methode 1
+fm <- nls(Confirmed ~ SSasymp(DaysPassed, Asym, R0, lrc), data = CH)
+fx <- function(x, Asym, R0, lrc)Asym+(R0-Asym)*exp(-exp(lrc)*x)
+p <- coef(fm)
+with(CH, plot(DaysPassed, Confirmed))
+curve(fx(x, Asym=p["Asym"], R0=p["R0"], lrc=p["lrc"]), add=T, col="red")
+
+###2 Methode 2
+ggplot(data=CH, aes(x=DaysPassed, y=Confirmed)) +
+geom_point() +
+geom_smooth(color="Blue", se=T) +
+geom_smooth(method="nls", formula=y~SSasymp(x, Asym, R0, lrc), color="red", se=F, fullrange=T) +
+scale_x_continuous(limits=c(0,100))
+
 
 # Toepassing TBATS op BE
 
