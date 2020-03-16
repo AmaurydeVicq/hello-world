@@ -18,15 +18,14 @@ Hier gaan we werken aan de coronavirus database om te voorspellen. Eens even kij
 
 On va charger les packages!!!! 
 
-```{r include = FALSE, message = FALSE, wSSarning = FALSE}
+```{r include = FALSE, message = FALSE, warning = FALSE}
 library(readxl)
 library(rvest)
 library(tidyverse)
 library(fuzzyjoin)
 library(magrittr)
 library(lubridate)
-library(forecast)
-library(minpack.lm)
+library(glogis)
 
 
 x <- c("ggmap", "rgdal", "rgeos", "maptools", "tmap")
@@ -81,114 +80,57 @@ PerCountry <- Alltogether %>%
   group_by(Country.Region, name) %>%
   summarise(Confirmed = sum(Confirmed), 
             Deaths = sum(Deaths), 
-            Recovered = sum(Recovered))
-
-# Toepassing SSasymy op CH
-CHConfirmed <- subset(PerCountry, Country.Region == "China", select = c("name", "Confirmed"))
-
-## Data variabele omzetten naar integer (werk niet met data)
-DaysPassed <- seq(1:53)
-CH <- cbind(CHConfirmed, DaysPassed)
-CH <- select(CH,2:3)              
-
-## Model toepassen en plotten 
-###1 Methode 1
-fm <- nls(Confirmed ~ SSasymp(DaysPassed, Asym, R0, lrc), data = CH)
-fx <- function(x, Asym, R0, lrc)Asym+(R0-Asym)*exp(-exp(lrc)*x)
-p <- coef(fm)
-with(CH, plot(DaysPassed, Confirmed))
-curve(fx(x, Asym=p["Asym"], R0=p["R0"], lrc=p["lrc"]), add=T, col="red")
-
-###2 Methode 2
-ggplot(data=CH, aes(x=DaysPassed, y=Confirmed)) +
-geom_point() +
-geom_smooth(color="Blue", se=T) +
-geom_smooth(method="nls", formula=y~SSasymp(x, Asym, R0, lrc), color="red", se=F, fullrange=T) +
-scale_x_continuous(limits=c(0,100))
+            Recovered = sum(Recovered)) 
 
 
-# Toepassing TBATS op BE
+PerCountry <- PerCountry %>%
+  ungroup(Country.Region) %>%
+  mutate(Country.Region = as.character(Country.Region))
 
-BEConfirmed <- subset(PerCountry, Country.Region == "Belgium", select = c("name", "Confirmed"))
+PerCountry$Country.Region[PerCountry$Country.Region == "US"] <- "United States"
 
-BEL30T <- BEConfirmed %>%
-select(2) %>%
-ts() %>%
-tbats() %>%
-forecast(h = 30)
+firstday <- PerCountry %>%
+  group_by(Country.Region) %>%
+  filter(Confirmed > 0) %>%
+  mutate(firstday = min(name)) %>%
+  select(Country.Region, firstday) %>%
+  distinct()
 
-BEL60T <- BEConfirmed %>%
-select(2) %>%
-ts() %>%
-tbats() %>%
-forecast(h = 60)
+PerCountry <- merge(PerCountry, firstday)
 
+PerCountry <- PerCountry %>%
+  mutate(sincefirstday = name - firstday)
+```
 
-# Toepassing HOLT op BE (werkt niet)
-
-BEConfirmed <- subset(PerCountry, Country.Region == "Belgium", select = c("name", "Confirmed"))
-
-BEL30H <- BEConfirmed %>%
-select(2) %>%
-ts() %>%
-holt() %>%
-forecast(h = 30)
-
-BEL60H <- BEConfirmed %>%
-select(2) %>%
-ts() %>%
-holt() %>%
-forecast(h = 60)
+Les premières analyses!
 
 
-# Toepassing TBATS op NL
+```{r}
+PerCountry %>%
+  filter(sincefirstday > 1, 
+         Country.Region == "Italy" | Country.Region == "Netherlands") %>%
+  ggplot(aes(x = sincefirstday, 
+             y = Deaths, 
+             color = Country.Region)) + geom_line()
 
-NLConfirmed <- subset(PerCountry, Country.Region == "Netherlands", select = c("name", "Confirmed"))
+gf <- PerCountry %>%
+filter(sincefirstday >0,
+       Country.Region == "Italy") %>%
+  select(Deaths, sincefirstday) %>%
+  arrange(sincefirstday) %>%
+  mutate(sincefirstday = as.numeric(sincefirstday))
 
-NL30 <- NLConfirmed %>%
-select(2) %>%
-ts() %>%
-tbats() %>%
-forecast(h = 30)
+gf %>%
+  mutate()
 
-NL60 <- NLConfirmed %>%
-select(2) %>%
-ts() %>%
-tbats() %>%
-forecast(h = 60)
-
-# Toepassing HOLT op NL (werk niet)
-
-NLConfirmed <- subset(PerCountry, Country.Region == "Netherlands", select = c("name", "Confirmed"))
-
-NL30 <- NLConfirmed %>%
-select(2) %>%
-ts() %>%
-holt() %>%
-forecast(h = 30)
-
-NL60 <- NLConfirmed %>%
-select(2) %>%
-ts() %>%
-holt() %>%
-forecast(h = 60)
-
-# Alles even plotten
-
-par(mfrow=c(2,2))
-plot(BEL30) 
-plot(BEL60) 
-plot(NL30) 
-plot(NL60) 
-
-
+glm_simple <-glm(data = gf, Deaths ~ sincefirstday, family = poisson(link = "log"))
 
 ```
 
 Laten we eerst een map maken van de hele wereld op een specifieke datum, bijv. `r Sys.Date() -1`. 
 
 ```{r}
-date <- Sys.Date() -2
+date <- Sys.Date() -1
 
 TheWorld <- readOGR(layer = "Countries_WGS84", dsn = "Data")
 
@@ -197,30 +139,32 @@ a <- PerCountry %>%
 
 TheWorld@data <- left_join(TheWorld@data, a, by = c("CNTRY_NAME" = "Country.Region"))
   
-#stringdist_join(TheWorld@data, PerCountry, 
-     #           by = c(CNTRY_NAME = "Country.Region"), 
-     #           mode = "left",
-     #           method = "osa",
-     #           max_dist = 1)
-
 qtm(TheWorld, fill = "Confirmed", 
-                             fill.breaks = c(0,10,100,1000,10000,20000, Inf))
+                             fill.breaks = c(0,1, 10,100,1000,10000,20000, Inf))
 
 ```
 
 Laten we nu een functie maken die de hele wereld op een specifieke datum kan extracten:
 Faisons-nous une function qui peut extraire le monde entier à une date spécifique: 
 
+Arguments: 
+
+- Date (no default), format MM-DD-YYYY
+
+- Fill: Confirmed (default), Deaths, Recovered
+
+- fill.breaks: default `c(0, 1, 10,100,1000,10000,20000,Inf)`
+
 ```{r}
-TheWorldAt <- function(date){
-  date <- mdy(date) 
+TheWorldAt <- function(date, fill = "Confirmed", fill.breaks = c(0, 1, 10,100,1000,10000, 20000, Inf)){
+  date <- ifelse(class(date) != "Date", mdy(date), date)
   TheWorld <- readOGR(layer = "Countries_WGS84", dsn = "Data")
   a <- PerCountry %>%
     filter(name == date)
   TheWorld@data <- left_join(TheWorld@data, a, by = c("CNTRY_NAME" = "Country.Region"))
   qtm(TheWorld, 
-     fill = "Confirmed", 
-     fill.breaks = c(0,10,100,1000,10000,20000, Inf)
+     fill = fill, 
+     fill.breaks = fill.breaks
  )
 }
 
@@ -229,10 +173,65 @@ TheWorldAt <- function(date){
 Cela prend le format MMDDYYYY:
 
 ```{r}
-TheWorldAt("01-28-2020")
+TheWorldAt("01-28-2020", fill.breaks = c(0,50,100,Inf))
 
 TheWorldAt("02-28-2020")
+
+TheWorldAt("Feb 14 2020", "Recovered")
 ```
+
+Maintenant, je veux créer une fonction qui développe une series de graphiques à partir d'une certaine date jusqu'à une autre. J'appelle la function `TheWorldFromTo`. 
+
+```{r}
+TheWorldFromTo <- function(start, end, ...) {
+  start = mdy(start)
+  end = mdy(end)
+  dates <- start + seq(from = 0, to = end - start)
+  lapply(dates, TheWorldAt, ...)
+}
+
+test <- TheWorldFromTo("02-28-2020","03-05-2020")
+
+test[[1]]
+
+test[[3]]
+```
+
+
+Hier een .gif :
+
+```{r}
+TheWorld <- readOGR(layer = "Countries_WGS84", dsn = "Data")
+
+PerCountry <- PerCountry %>%
+  filter(name == "2020-02-27" | name == "2020-02-28") %>%
+  mutate(name = as.character(name))
+
+TheWorld$CNTRY_NAME
+
+TheWorld <- sp::merge(TheWorld,PerCountry, 
+                      by.x = "CNTRY_NAME",
+                      by.y = "Country.Region", 
+                      duplicateGeoms = TRUE)
+
+tm_shape(TheWorld) + tm_fill("Confirmed", 
+                             palette = "viridis",
+                             breaks = c(0,1,10,100,1000,10000,20000,Inf),
+                            showNA = FALSE) + 
+  tm_borders(col = "white", lwd = 0.2) +
+  tm_facets(along = "name", drop.units = TRUE)
+
+tmap_animation(m1, filename="World_corona.gif", width=1200, delay=100)
+
+```
+
+Voici une fonction qui cree des .gifs:
+
+```{r}
+
+
+```
+
 
 
 Permettons-nous maintenant de créer des variables qui prennent en considération la taille de la population: 
