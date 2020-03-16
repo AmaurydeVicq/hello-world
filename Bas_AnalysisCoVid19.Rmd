@@ -26,6 +26,7 @@ library(fuzzyjoin)
 library(magrittr)
 library(lubridate)
 library(glogis)
+library(gridExtra)
 
 
 x <- c("ggmap", "rgdal", "rgeos", "maptools", "tmap")
@@ -100,28 +101,46 @@ PerCountry <- merge(PerCountry, firstday)
 
 PerCountry <- PerCountry %>%
   mutate(sincefirstday = name - firstday)
+
+day100 <- PerCountry %>%
+  group_by(Country.Region) %>%
+  filter(Confirmed > 99) %>%
+  mutate(daymore100 = min(name)) %>%
+  select(Country.Region, daymore100) %>%
+  distinct()
+
+PerCountry <- left_join(PerCountry, day100)
+
+PerCountry <- PerCountry %>%
+  mutate(sincehunday = name - daymore100)
 ```
 
 Les premières analyses!
 
 
 ```{r}
+
+landen <- c("Italy", "Belgium" , "France", "Spain", "Germany", "United Kingdom", "Netherlands")
 PerCountry %>%
+  filter(Country.Region %in% landen, sincehunday > 0) %>%
+  ggplot(aes(x = sincehunday, 
+             y = Confirmed, 
+             color = Country.Region)) + geom_line() + scale_y_continuous(trans = 'log10')
+
+p2 <- PerCountry %>%
   filter(sincefirstday > 1, 
-         Country.Region == "Italy" | Country.Region == "Netherlands") %>%
+         Country.Region == "Italy" | Country.Region == "Belgium") %>%
   ggplot(aes(x = sincefirstday, 
              y = Deaths, 
              color = Country.Region)) + geom_line()
 
-gf <- PerCountry %>%
-filter(sincefirstday >0,
-       Country.Region == "Italy") %>%
-  select(Deaths, sincefirstday) %>%
-  arrange(sincefirstday) %>%
-  mutate(sincefirstday = as.numeric(sincefirstday))
+p3 <-  PerCountry %>%
+  filter(sincefirstday > 1, 
+         Country.Region == "Belgium" | Country.Region == "Netherlands") %>%
+  ggplot(aes(x = sincefirstday, 
+             y = Deaths, 
+             color = Country.Region)) + geom_line()
 
-gf %>%
-  mutate()
 
 glm_simple <-glm(data = gf, Deaths ~ sincefirstday, family = poisson(link = "log"))
 
