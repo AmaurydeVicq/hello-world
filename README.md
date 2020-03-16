@@ -1,9 +1,12 @@
 # hello-world
-This is an introductionay data repository
+This is an introductory data repository to try out collaboration and do various things regarding CoViD-19. 
 
-# Hallo Amaury
+# Contents
 
-Ik heb je repo geforked en geef je zo een pull request, zodat je jouw repo kan updaten met werk dat ik gedaan heb! Super handig als je met mensen samenwerkt. (Bas)
+- .gif mapping the progress of the Coronavirus around the world
+- Code conducting various graphical and predictive analyses
+- Output of these analysis
 
-# Hallo Amaury 2
-Ik heb op instructies van Bas hetzelfde gedaan. (Ruben)
+# Possibly later
+
+..Blogposts!
