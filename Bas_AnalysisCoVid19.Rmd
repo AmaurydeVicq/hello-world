@@ -1,0 +1,253 @@
+---
+title: "Hallo Amaury"
+author: "Bas Machielsen"
+date: "3/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Hallo Amaury
+
+Hier gaan we werken aan de coronavirus database om te voorspellen. Eens even kijken waar we wat data vandaan kunnen plukken! 
+
+
+## Packages
+
+On va charger les packages!!!! 
+
+```{r include = FALSE, message = FALSE, warning = FALSE}
+library(readxl)
+library(rvest)
+library(tidyverse)
+library(fuzzyjoin)
+library(magrittr)
+library(lubridate)
+library(glogis)
+
+
+x <- c("ggmap", "rgdal", "rgeos", "maptools", "tmap")
+lapply(x, library, character.only = TRUE)
+```
+
+Hier eerst drie datasets van <https://github.com/CSSEGISandData/COVID-19>. 
+
+```{r}
+Confirmed <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv", colClasses = )
+
+Deaths <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv")
+
+Recovered <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv")
+```
+
+Nettoyons les données!
+
+```{r cars}
+Corona <- list(Confirmed, Deaths, Recovered)
+
+a <- ncol(Confirmed)
+#On va le pivoter
+Corona <- lapply(Corona, pivot_longer, 5:a)
+
+#Change the date strings to real dates
+Analysis <- lapply(Corona, mutate, name = str_replace(name, "X", ""))
+Analysis <- lapply(Analysis, mutate, name = mdy(name))
+
+```
+
+
+```{r}
+Alltogether <- merge(Analysis[[1]], Analysis[[2]], 
+              by = c('Province.State', 
+                     'Country.Region', 
+                     'Long', 
+                     'Lat', 
+                     'name'))
+
+Alltogether <- merge(Alltogether, Analysis[[3]], 
+              by = c('Province.State', 
+                     'Country.Region', 
+                     'Long', 
+                     'Lat', 
+                     'name'))
+
+
+names(Alltogether)[6:8] <- c("Confirmed", "Deaths", "Recovered")
+
+PerCountry <- Alltogether %>%
+  group_by(Country.Region, name) %>%
+  summarise(Confirmed = sum(Confirmed), 
+            Deaths = sum(Deaths), 
+            Recovered = sum(Recovered)) 
+
+
+PerCountry <- PerCountry %>%
+  ungroup(Country.Region) %>%
+  mutate(Country.Region = as.character(Country.Region))
+
+PerCountry$Country.Region[PerCountry$Country.Region == "US"] <- "United States"
+
+firstday <- PerCountry %>%
+  group_by(Country.Region) %>%
+  filter(Confirmed > 0) %>%
+  mutate(firstday = min(name)) %>%
+  select(Country.Region, firstday) %>%
+  distinct()
+
+PerCountry <- merge(PerCountry, firstday)
+
+PerCountry <- PerCountry %>%
+  mutate(sincefirstday = name - firstday)
+```
+
+Les premières analyses!
+
+
+```{r}
+PerCountry %>%
+  filter(sincefirstday > 1, 
+         Country.Region == "Italy" | Country.Region == "Netherlands") %>%
+  ggplot(aes(x = sincefirstday, 
+             y = Deaths, 
+             color = Country.Region)) + geom_line()
+
+gf <- PerCountry %>%
+filter(sincefirstday >0,
+       Country.Region == "Italy") %>%
+  select(Deaths, sincefirstday) %>%
+  arrange(sincefirstday) %>%
+  mutate(sincefirstday = as.numeric(sincefirstday))
+
+gf %>%
+  mutate()
+
+glm_simple <-glm(data = gf, Deaths ~ sincefirstday, family = poisson(link = "log"))
+
+```
+
+Laten we eerst een map maken van de hele wereld op een specifieke datum, bijv. `r Sys.Date() -1`. 
+
+```{r}
+date <- Sys.Date() -1
+
+TheWorld <- readOGR(layer = "Countries_WGS84", dsn = "Data")
+
+a <- PerCountry %>%
+  filter(name == date)
+
+TheWorld@data <- left_join(TheWorld@data, a, by = c("CNTRY_NAME" = "Country.Region"))
+  
+qtm(TheWorld, fill = "Confirmed", 
+                             fill.breaks = c(0,1, 10,100,1000,10000,20000, Inf))
+
+```
+
+Laten we nu een functie maken die de hele wereld op een specifieke datum kan extracten:
+Faisons-nous une function qui peut extraire le monde entier à une date spécifique: 
+
+Arguments: 
+
+- Date (no default), format MM-DD-YYYY
+
+- Fill: Confirmed (default), Deaths, Recovered
+
+- fill.breaks: default `c(0, 1, 10,100,1000,10000,20000,Inf)`
+
+```{r}
+TheWorldAt <- function(date, fill = "Confirmed", fill.breaks = c(0, 1, 10,100,1000,10000, 20000, Inf)){
+  date <- ifelse(class(date) != "Date", mdy(date), date)
+  TheWorld <- readOGR(layer = "Countries_WGS84", dsn = "Data")
+  a <- PerCountry %>%
+    filter(name == date)
+  TheWorld@data <- left_join(TheWorld@data, a, by = c("CNTRY_NAME" = "Country.Region"))
+  qtm(TheWorld, 
+     fill = fill, 
+     fill.breaks = fill.breaks
+ )
+}
+
+``` 
+
+Cela prend le format MMDDYYYY:
+
+```{r}
+TheWorldAt("01-28-2020", fill.breaks = c(0,50,100,Inf))
+
+TheWorldAt("02-28-2020")
+
+TheWorldAt("Feb 14 2020", "Recovered")
+```
+
+Maintenant, je veux créer une fonction qui développe une series de graphiques à partir d'une certaine date jusqu'à une autre. J'appelle la function `TheWorldFromTo`. 
+
+```{r}
+TheWorldFromTo <- function(start, end, ...) {
+  start = mdy(start)
+  end = mdy(end)
+  dates <- start + seq(from = 0, to = end - start)
+  lapply(dates, TheWorldAt, ...)
+}
+
+test <- TheWorldFromTo("02-28-2020","03-05-2020")
+
+test[[1]]
+
+test[[3]]
+```
+
+
+Hier een .gif :
+
+```{r}
+TheWorld <- readOGR(layer = "Countries_WGS84", dsn = "Data")
+
+PerCountry <- PerCountry %>%
+  filter(name == "2020-02-27" | name == "2020-02-28") %>%
+  mutate(name = as.character(name))
+
+TheWorld$CNTRY_NAME
+
+TheWorld <- sp::merge(TheWorld,PerCountry, 
+                      by.x = "CNTRY_NAME",
+                      by.y = "Country.Region", 
+                      duplicateGeoms = TRUE)
+
+tm_shape(TheWorld) + tm_fill("Confirmed", 
+                             palette = "viridis",
+                             breaks = c(0,1,10,100,1000,10000,20000,Inf),
+                            showNA = FALSE) + 
+  tm_borders(col = "white", lwd = 0.2) +
+  tm_facets(along = "name", drop.units = TRUE)
+
+tmap_animation(m1, filename="World_corona.gif", width=1200, delay=100)
+
+```
+
+Voici une fonction qui cree des .gifs:
+
+```{r}
+
+
+```
+
+
+
+Permettons-nous maintenant de créer des variables qui prennent en considération la taille de la population: 
+
+```{r}
+url <- "https://en.wikipedia.org/wiki/List_of_countries_by_population_(United_Nations)"
+  
+read_html(url) %>%
+  html_nodes("#main") %>%
+  html_table(fill = TRUE) %>%
+  extract2(1) %>%
+  mutate(`Country or area` = str_replace_all(`Country or area`,"[\\s]?\\[(.+)\\]", "")) %>%
+  mutate(`Population(1 July 2019)` = as.numeric(str_replace_all(`Population(1 July 2019)`, ",","")))
+
+
+
+```
+
+
