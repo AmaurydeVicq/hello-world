@@ -1,0 +1,52 @@
+---
+title: "Regional Spread BE-FR-NL-DE"
+author: "Ruben Peeters"
+date: "17-3-2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Packages
+
+On va charger les packages!!!! 
+
+```{r include = FALSE, message = FALSE, warning = FALSE}
+library(readxl)
+library(rvest)
+library(tidyverse)
+library(fuzzyjoin)
+library(magrittr)
+library(lubridate)
+library(glogis)
+library(gridExtra)
+```
+
+## Get Regional Data
+```{r}
+NL_Confirmed <- read_delim("hello-world/Data/NL-Municipal-1732020.csv", ";", escape_double = FALSE, trim_ws = TRUE)
+
+FR_Confirmed <- read_csv("hello-world/Data/FR_Confirmed.csv")
+
+DE_Confirmed <- 
+```
+
+## Clean and adjust data
+```{r}
+#Add country and Date Column for NL
+NL_Confirmed <- NL_Confirmed %>% mutate(country = "NL", dag = "2020-03-17")
+NL_Confirmed <- NL_Confirmed %>% rename("municipality" = Category, "cases" = Aantal)
+
+
+#On va pivoter la France
+a <- ncol(FR_Confirmed)
+FR_Confirmed_long <- pivot_longer(FR_Confirmed, cols=2:a, names_to = "region", values_to = "cases")
+View(FR_Confirmed_long)
+
+#Add Country Column for France
+FR_Confirmed_long <- FR_Confirmed_long %>% mutate( country = "FR") %>% rename("dag"= Date)
+
+
+````
