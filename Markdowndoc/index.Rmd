@@ -1,0 +1,243 @@
+---
+title: The causes and consequences of CoViD-19
+author: Amaury de Vicq, Ruben Peeters, Bas Machielsen
+github: {user: AmaurydeVicq, repo: hello-world, branch: "master"}
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    css: style.css
+---
+
+
+```{r include = FALSE, message = FALSE, warning = FALSE}
+library(readxl)
+library(rvest)
+library(tidyverse)
+library(fuzzyjoin)
+library(magrittr)
+library(leaflet)
+library(lubridate)
+library(glogis)
+library(gridExtra)
+library(kableExtra)
+
+
+x <- c("ggmap", "rgdal", "rgeos", "maptools", "tmap")
+lapply(x, library, character.only = TRUE)
+
+Keystats <- read.csv("Keystats.csv")
+Countries <- as.numeric(read.table("test.txt"))
+```
+
+# Introduction
+
+The ongoing pandemic of coronavirus disease 2019 (COVID-19) is caused by severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2). The outbreak was first identified in Wuhan, Hubei, China, in December 2019 and recognised as a pandemic by the World Health Organization (WHO) on 11 March 2020. As of `r format(today(), "%d %b %Y")`, over `r Keystats[1,2]` cases of COVID-19 have been reported in more than `r Countries` countries and territories, with major outbreaks in mainland China, Europe, Iran and South Korea, among others. More than `r Keystats[1,3]` people have died from the disease and over `r Keystats[1,4]` have recovered. As of `r format(today(), "%d %b %Y")`, Europe is the center of active cases.
+
+Our point of view is that COVID-19 is highly dangerous, both for healthy and vulnerable individuals. In addition to the risk of flooding the healthcare system, which, in our view, can greatly increase the mortality rate of the virus, as well as give rise to other complications, the virus is expected to cause major economic disruptions of a scale comparable to, if not greater than, the greater depression. 
+
+In this study, we will ask, and attempt to answer, various questions, to the extent that we can.
+
+# Several questions we attempt to answer
+
+- How does the disease progress and how do various countries compare to one another?
+
+- What are the underlying reasons for difference in mortality rates?
+
+- What are the economic consequences of the COVID-19 pandemic?
+
+We believe the first question to be interesting and of relevance primarily to policy makers, who are expected to act urgently and face a trade-off between minimizing expected deaths and economic costs. The second question is interesting because it can serve as a benchmark of the effectivity of several interventions already undertaken by governments throughout the world. As of March 15th, most governments have severely restricted aviation, and many countries have closed their borders to all other countries, limiting entrance only to citizens. Some Asian countries have installed quaraintaine on a massive scale, and some other countries seem to be following in their wake, particularly France, Italy, and Spain. 
+
+Finally, the last question is a question that is both relevant to the general public as well as to academics. In this blog, we attempt to take an approach that is informed by history, rather than by state-of-the-art macroeconomic theory. We attempt to lay bare parallels as well as differences between earlier pandemic-induced macroeconomic consequences and the present CoViD-19 case. In addition, we supplement our anecdotal evidence with various empirical case studies, and we use various time series and other econometric models to estimate the future impact of the CoViD-19 and take into account various institutional, cultural and macroeconomic differences between countries. 
+
+
+# Question 1: How does the disease progress?
+
+In this part, we will do two things: first, we track the disease and provide the reader with various tools to investigate the seriousness of the pandemic. Second, we will single out a few countries, and provide the reader with several anecdotal reasons as to which measures have been taken, why, and to what effect. 
+
+## 1.1 The Data
+
+The Github Repository <https://github.com/CSSEGISandData/COVID-19> contains daily-updated data about the coronavirus in different countries, as well as in different provinces of different countries (e.g. China, United States). We will be using these data to keep track of all confirmed cases world-wide. 
+
+
+## 1.2 Cleaning the data
+
+We will need several packages to read, and clean our data. The relevant list of packages can be found in the appropriate .Rmd-file on <https://www.github.com/AmauryDeVicq/hello-world>. 
+
+Now, we use the three time-series .csv files from the CSSEGIS repository. The three files contain exactly the same meta-information, but contain information about three key statistics: Confirmed cases, Deaths, and Recovered. 
+
+```{r}
+Confirmed <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv")
+
+Deaths <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv")
+
+Recovered <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv")
+```
+
+Let's try to put all of the information in one file:
+
+```{r cars}
+# Making a list
+Corona <- list(Confirmed, Deaths, Recovered)
+
+# How many columns?
+a <- ncol(Confirmed)
+
+#Let's convert each of the dataframes to a 'long format'
+Corona <- lapply(Corona, pivot_longer, 5:a)
+
+#Change the date strings to real dates
+Corona <- lapply(Corona, mutate, name = str_replace(name, "X", ""))
+Corona<- lapply(Corona, mutate, name = mdy(name))
+
+```
+
+
+Next step, we merge all files to one comprehensive file, containing information about (i) Confirmed cases, (ii) Deaths and (iii) Recoveries. 
+
+```{r}
+Alltogether <- merge(Corona[[1]], Corona[[2]], 
+              by = c('Province.State', 
+                     'Country.Region', 
+                     'Long', 
+                     'Lat', 
+                     'name'))
+
+Alltogether <- merge(Alltogether, Corona[[3]], 
+              by = c('Province.State', 
+                     'Country.Region', 
+                     'Long', 
+                     'Lat', 
+                     'name'))
+
+#Renaming the variables
+names(Alltogether)[6:8] <- c("Confirmed", "Deaths", "Recovered")
+```
+
+Now, the `Alltogether` dataset consists not only of countries, but also of provinces of several countries, such as China. For our analysis, however, we want to confine ourselves to countries, and not to parts of countries. This is what we do in the next step: We aggregate the data by country.
+
+Before we do so, however, let us extract several relevant statistics, which we will display in the introduction paragraph. 
+
+```{r results = "asis"}
+Keystats <- Alltogether %>%
+  filter(name == max(name)) %>%
+  summarise(Confirmed = sum(Confirmed), Deaths = sum(Deaths), Recovered = sum(Recovered))
+
+write.csv(Keystats, "Keystats.csv")
+
+length(unique(Alltogether$Country.Region)) %>%
+  write.table("countries.txt", row.names = F, col.names = F)
+
+kable(Keystats, caption = "Key statistics", 
+        booktabs = TRUE, 
+        row.names = FALSE, 
+        format = "markdown",
+        position = "center")
+```
+
+Let us now proceed by grouping the data together on a per-country basis:
+
+```{r}
+PerCountry <- Alltogether %>%
+  group_by(Country.Region, name) %>%
+  summarise(Confirmed = sum(Confirmed), 
+            Deaths = sum(Deaths), 
+            Recovered = sum(Recovered)) 
+
+
+PerCountry <- PerCountry %>%
+  ungroup(Country.Region) %>%
+  mutate(Country.Region = as.character(Country.Region))
+
+#Correct a few country names
+PerCountry$Country.Region[PerCountry$Country.Region == "US"] <- "United States"
+PerCountry$Country.Region[PerCountry$Country.Region == "Czechia"] <- "Czech Republic"
+```
+
+### Days since first infection
+
+We then decide to calculate two variables, the number of days that have passed since the first infection (can also be negative):
+
+```{r}
+firstday <- PerCountry %>%
+  group_by(Country.Region) %>%
+  filter(Confirmed > 0) %>%
+  mutate(firstday = min(name)) %>%
+  select(Country.Region, firstday) %>%
+  distinct()
+
+PerCountry <- merge(PerCountry, firstday)
+
+PerCountry <- PerCountry %>%
+  mutate(sincefirstday = name - firstday)
+```
+
+### Days since 100th infection
+
+We create an identical variable, `sincehunday`, indicating how many days have passed since a country's 100th infection. 
+
+```{r message = FALSE}
+day100 <- PerCountry %>%
+  group_by(Country.Region) %>%
+  filter(Confirmed > 99) %>%
+  mutate(daymore100 = min(name)) %>%
+  select(Country.Region, daymore100) %>%
+  distinct()
+
+PerCountry <- left_join(PerCountry, day100)
+
+PerCountry <- PerCountry %>%
+  mutate(sincehunday = name - daymore100)
+```
+
+
+## 1.3 Biases in various directions
+
+This is a good moment to talk about the possible shortcomings of the disposable data. Many people note that official data regarding Mortality is incorrect. There might be a number of reasons why this is so:
+
+- First, several governments might have incentives to camouflage the real numbers because they run the risk of eroding their popularity. This argument is particularly used in the case of China and Iran. 
+
+- Second, the mortality rate in a particular period $t$ is computed as $\textrm{Mortality Rate}_t = \frac{\textrm{Deaths}_t}{\textrm{Confirmed Cases}_t}$ and its cumulative equivalent. People often note that this fraction is biased *upwards* because the number of confirmed cases is lower than the number of real cases. 
+
+  - This bias exists. On the other hand, there is also a bias in the other direction: $\textrm{Deaths}_t$ does not yet take into account people alive now, but who will die very soon.
+
+- Third, mortality rates might be biased because of demographic state of affairs: Italy has an aging population, so therefore, the mortality rate cannot be extrapolated to countries, not even to *ceteris paribus* countries with a younger population. 
+
+  - While this is technically right, we first want to focus on this kind of unconditional mortality. In a subsequent section, we will attempt to analyze mortality per country as a function of demographic composition. 
+  
+## The First Analyses
+
+Let us now look at the first analyses. Let us start with our home countries - we want to investigate several trends in Europe. 
+
+```{r message = FALSE, warning = FALSE}
+
+Europe <- readOGR(layer = "NUTS_RG_03M_2016_3035_LEVL_0", 
+                    dsn = "../Data")
+
+countrycodes <- read.csv("../Data/list-eurostat-eea-and-fao-country-codes-side-by-side.csv")
+countrycodes <- countrycodes[1:38,c(1,6)]
+
+Europe <- sp::merge(Europe, countrycodes, 
+                    by.x = "CNTR_CODE", 
+                    by.y = "estatcode.text")
+
+EuropeCorona <- PerCountry %>%
+  filter(Country.Region %in% countrycodes$name.text) %>%
+  filter(name == Sys.Date() -2)
+
+Europe <- sp::merge(Europe, EuropeCorona, 
+                    by.x = "name.text", 
+                    by.y = "Country.Region")
+
+m1 <- qtm(Europe, 
+          fill = "Confirmed", 
+          fill.palette = "viridis",
+          fill.breaks = c(0,1, 10,100,1000,2000,5000, 10000, Inf))
+
+tmap_leaflet(m1)
+
+
+```
