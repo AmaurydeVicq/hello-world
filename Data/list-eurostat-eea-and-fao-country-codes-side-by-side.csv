@@ -1,0 +1,41 @@
+estatcode:text,eeacode:text,nutscode:text,faocode:text,gdp:number,name:text
+BE,BE,None,255,43.98441,Belgium
+BG,BG,None,27,6.5014677,Bulgaria
+CZ,CZ,None,167,18.133423,Czech Republic
+DK,DK,None,54,55.783062,Denmark
+DE,DE,None,79,40.461132,Germany
+EE,EE,None,63,14.231171,Estonia
+IE,IE,None,104,50.826176,Ireland
+EL,GR,None,84,29.045162,Greece
+ES,ES,None,203,31.691517,Spain
+FR,FR,None,68,42.196472,France
+IT,IT,None,106,34.89257,Italy
+CY,CY,None,50,22.680254,Cyprus
+LV,LV,None,119,11.631883,Latvia
+LT,LT,None,126,11.193141,Lithuania
+LU,LU,None,256,103.14793,Luxembourg
+HU,HU,None,97,12.917068,Hungary
+MT,MT,None,134,19.153477,Malta
+NL,NL,None,150,47.681213,Netherlands
+AT,AT,None,11,45.39957,Austria
+PL,PL,None,173,11.235886,Poland
+PT,PT,None,174,21.81285,Portugal
+RO,RO,None,183,7.498371,Romania
+SI,SI,None,198,23.880295,Slovenia
+SK,SK,None,199,16.04577,Slovakia
+FI,FI,None,67,44.359554,Finland
+SE,SE,None,210,43.29126,Sweden
+UK,GB,None,229,34.91987,United Kingdom
+IS,IS,None,99,37.915627,Iceland
+LI,LI,None,125,134.05556,Liechtenstein
+NO,NO,None,162,78.18268,Norway
+CH,CH,None,211,64.186325,Switzerland
+HR,HR,None,98,14.316148,Croatia
+MK,MK,None,154,4.474042,Former Yugoslav Republic of Macedonia
+TR,TR,None,223,8.447919,Turkey
+AL,AL,None,3,3.75,Albania
+BA,BA,None,80,4.532447,Bosnia-Herzegovina
+ME,ME,None,273,6.562599,Montenegro
+RS,RS,None,272,4.3612013,Serbia
+JP,None,None,None,None,Japan
+US,None,None,None,None,United States of America
