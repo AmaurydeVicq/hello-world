@@ -1,0 +1,213 @@
+---
+title: "Comparaison entre les Pays-Bas, la France, la Belgique, l'Allemagne"
+author: "Bas Machielsen"
+date: "3/17/2020"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    css: style.css
+---
+
+```{r include = FALSE, message = FALSE, warning = FALSE}
+library(readxl)
+library(rvest)
+library(tidyverse)
+library(fuzzyjoin)
+library(magrittr)
+library(leaflet)
+library(lubridate)
+library(glogis)
+library(gridExtra)
+library(kableExtra)
+
+
+x <- c("ggmap", "rgdal", "rgeos", "maptools", "tmap")
+lapply(x, library, character.only = TRUE)
+```
+
+# Introduction
+Dans ce blog, je tente de faire le point de la situation autour du Coronavirus (CoViD-19), qui met sous pression plusieurs pays d’Europe, y compris la France, la Belgique et les Pays-Bas. Puisqu’il y a des bases de données qui nous permettent d’analyser l’ampleur du virus au plus précis niveau, je voudrais faire une comparaison qui se concentre sur des régions, au lieu des pays entiers. Vu qu’il y a déjà une poignée d’analyses détaillant la situation entre pays, le manque d’une analyse entre-régions devient de plus en plus clair.
+
+# La source des données
+
+On va utiliser plusieurs sources qui nous sont disponibles. 
+
+- Pour la France: <https://www.data.gouv.fr/fr/datasets/cas-confirmes-dinfection-au-covid-19-par-region/>
+
+```{r}
+#Importer les données françaises via cet URL:
+France <- read.csv("https://www.data.gouv.fr/fr/datasets/r/fa9b8fc8-35d5-4e24-90eb-9abe586b0fa5",header = TRUE, check.names = F)
+France <- France %>%
+  pivot_longer(2:ncol(France), 
+               names_to = "departement", 
+               values_to = "montant") %>%
+  mutate(Date = ymd(Date))
+
+```
+
+- Pour la Belgique: Encore INCONNU
+
+- Pour les Pays-Bas, je vais entamer une autre approche: je vais utiliser `rvest` en scrapant les données du site web, et puis je vais ajouter la date ci-mentionnée. Puis, j'ajoute la date dans une colonne séparée, et je sauvegarde le fichier .csv. 
+
+```{r message = FALSE, warning = FALSE}
+#Importer les données néerlandaises va un peu plus difficilement: on va garder la date dans une colonne séparée:
+
+Netherlands <- read_html("https://www.rivm.nl/coronavirus-kaart-van-nederland") %>%
+  html_nodes("#csvData") %>%
+  html_text() %>%
+  read_lines() %>%
+  str_split(";") %>%
+  unlist() 
+
+Netherlands <- Netherlands[-1] %>%
+  matrix(ncol = 5, byrow = TRUE)
+
+Netherlands <- Netherlands[-(1:2),] %>%
+  as.data.frame()
+
+date <- read_html("https://www.rivm.nl/coronavirus-kaart-van-nederland") %>%
+  html_nodes('.with-background > p:nth-child(2)') %>%
+  html_text() %>%
+  str_extract("[0-9]{2}\\s[a-z]{1,}\\s[0-9]{4}")
+
+colnames(Netherlands) <- c("montant", "municipalite", "numero", "habitants", "montantparhabitant")
+
+Netherlands <- data.frame(Netherlands, date = date) %>%
+  filter(municipalite != "")
+
+write.csv(Netherlands, file = paste("../Data/","netherlands_",date,".csv", sep = ""))
+```
+
+
+- Après, je vais importer tous les fichiers qui ont rapport aux Pays-Bas, et je les fuse tous ensemble:
+
+```{r}
+files <- list.files("../Data")
+files <- files[grepl("netherlands(.+)", files)]
+
+#Temporary forget 17th..
+
+files <- files[1]
+
+key <- NULL
+Netherlands <- NULL
+for (i in files) {
+  key <- read.csv(paste("../Data/",files, sep = "")) %>%
+  select(-1)
+  Netherlands <- rbind(Netherlands, key)
+}
+```
+
+Les voilà.  Maintenant on va convertir ces informations en NUTS-niveau 1, c'est à dire le niveau nécessaire pour notre analyse géographique. 
+
+```{r}
+#Municipalites par province
+municipalites <- read_html("https://www.metatopos.eu/Gemtab.php") %>%
+  html_nodes("section.dikkerand:nth-child(3) > article:nth-child(1) > table:nth-child(2)") %>%
+  html_table(fill = TRUE, header = TRUE) %>%
+  data.frame()
+
+#municipalites par nl1 nl2 nl3 nl4
+
+NL1 <- read_html("https://www.regioatlas.nl/indelingen/indelingen_indeling/t/nuts_1_regio_s_landsdelen") %>%
+  html_nodes("#noord_nederland > div:nth-child(3) > ul:nth-child(2)") %>%
+  html_text(trim = TRUE) %>%
+  read_lines() %>%
+  str_replace_all("\t[\\s]{0,}","")
+
+NL2 <- read_html("https://www.regioatlas.nl/indelingen/indelingen_indeling/t/nuts_1_regio_s_landsdelen") %>%
+  html_nodes("#oost_nederland > div:nth-child(3) > ul:nth-child(2)") %>%
+  html_text(trim = TRUE) %>%
+  read_lines() %>%
+  str_replace_all("\t[\\s]{0,}","")
+  
+NL3 <- read_html("https://www.regioatlas.nl/indelingen/indelingen_indeling/t/nuts_1_regio_s_landsdelen") %>%
+  html_nodes("#west_nederland > div:nth-child(3) > ul:nth-child(2)") %>%
+  html_text(trim = TRUE) %>%
+  read_lines() %>%
+  str_replace_all("\t[\\s]{0,}","")
+
+NL4 <- read_html("https://www.regioatlas.nl/indelingen/indelingen_indeling/t/nuts_1_regio_s_landsdelen") %>%
+  html_nodes("#zuid_nederland > div:nth-child(3) > ul:nth-child(2)") %>%
+  html_text(trim = TRUE) %>%
+  read_lines() %>%
+  str_replace_all("\t[\\s]{0,}","")
+
+NUTSlvl1 <- 
+rbind(
+  data.frame(municipalite = NL1, NUTS = "NL1"),
+  data.frame(municipalite = NL2, NUTS = "NL2"),
+  data.frame(municipalite = NL3, NUTS = "NL3"),
+  data.frame(municipalite = NL4, NUTS = "NL4")
+  )
+
+
+Netherlands <- merge(Netherlands, NUTSlvl1)
+
+Netherlands <- Netherlands %>%
+  group_by(NUTS) %>%
+  summarise(montant = sum(montant))
+
+```
+
+On va convertir la France aussi en NUTS-niveau-1:
+
+```{r}
+conversion <- data.frame(
+  departement = unique(France$departement), 
+  NUTS_CODE = c("FRK", "FRC", "FRH", "FRB", "FRM",
+                "FRF", "FRE", "FR1", "FRD", "FRI",
+                "FRJ", "FRG", "FRL", "FRY", "FRY", 
+                "FRY", "FRY", "FRY", "FRY", "FRY"))
+write.csv(conversion, "../Data/conversion.csv")
+
+
+#Grand Est est Alsace-Champagne-Ardenne-Lorraine est FRF
+#Hauts-de-France est Nord-pas-de-Calais-Picardy est FRE
+#Occitanie est LANGUEDOC-ROUSSILLON-MIDI-PYRÉNÉES est FRJ
+
+France <- France %>%
+  filter(Date == "2020-03-16") %>%
+  merge(conversion) %>%
+  group_by(NUTS_CODE) %>%
+  summarise(montant = sum(montant))
+
+``` 
+
+Ainsi on a converti tout ce qu'il faut pour conduire une analyse géographique. 
+
+# Les analyses géographiques 
+
+Maintenant, nous conduisons des analyses géographiques à partir des cartes de l'agence de statistique Eurostat:
+
+```{r}
+#La fusion de France et des Pays-Bas
+
+Europe <- readOGR(layer = "NUTS_RG_03M_2016_3035_LEVL_1", 
+                    dsn = "../Data")
+
+Europe <- sp::merge(Europe, Netherlands, by.x = "NUTS_ID", by.y = "NUTS")
+
+Europe <- sp::merge(Europe, France, by.x = "NUTS_ID", by.y = "NUTS_CODE" )
+
+Europe@data <- Europe@data %>%
+  mutate(montant = ifelse(is.na(montant.x), montant.y, montant.x)) %>%
+  select(-montant.x, -montant.y)
+
+m1 <- tm_shape(Europe) + tm_polygons(col = "montant", 
+                               palette = "viridis",
+                               showNA = FALSE,
+                               breaks = c(0,1,10,100,200,500,1000,2000,Inf))
+m2 <- tmap_leaflet(m1)
+
+setView(m2, 4.8945, 52.3667, zoom = 5)
+
+
+```
+
+
+
