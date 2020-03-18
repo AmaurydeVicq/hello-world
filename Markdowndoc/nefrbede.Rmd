@@ -27,6 +27,9 @@ library(kableExtra)
 
 x <- c("ggmap", "rgdal", "rgeos", "maptools", "tmap")
 lapply(x, library, character.only = TRUE)
+
+#Ici, il faut choisir la data à laquelle on va construire la carte. 
+datum <- as.Date("2020-03-17")
 ```
 
 # Introduction
@@ -47,11 +50,35 @@ France <- France %>%
                values_to = "montant") %>%
   mutate(Date = ymd(Date))
 
+write.csv(France, "../Data/France.csv")
+
 ```
 
-- Pour la Belgique: Encore INCONNU
+- Pour la Belgique: On utilise ces données provenantes de Wikipedia: <https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Belgium> faute d'une source plus fiable. Traiter les données de la Belgique est assez facile:
 
+```{r}
+Belgium <- read_html("https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Belgium") %>%
+  html_nodes(".wikitable") %>%
+  html_table(fill = TRUE) %>%
+  data.frame() %>%
+  select(1,3,5,7)
+
+a <- as.numeric(nrow(Belgium))
+Belgium <- Belgium[-c(1,(a),(a-1)),] %>%
+  mutate(Date = ymd(Date))
+
+colnames(Belgium) <- c("Date", "BE2", "BE1", "BE3")
+
+Belgium <- Belgium %>%
+  pivot_longer(2:4, names_to = "NUTS_CODE", values_to = "montant")
+
+write.csv(Belgium, "../Data/Belgique.csv")
+```
+
+## Pays-Bas
 - Pour les Pays-Bas, je vais entamer une autre approche: je vais utiliser `rvest` en scrapant les données du site web, et puis je vais ajouter la date ci-mentionnée. Puis, j'ajoute la date dans une colonne séparée, et je sauvegarde le fichier .csv. 
+
+### Ecrire les nouveaux fichiers
 
 ```{r message = FALSE, warning = FALSE}
 #Importer les données néerlandaises va un peu plus difficilement: on va garder la date dans une colonne séparée:
@@ -74,24 +101,23 @@ date <- read_html("https://www.rivm.nl/coronavirus-kaart-van-nederland") %>%
   html_text() %>%
   str_extract("[0-9]{2}\\s[a-z]{1,}\\s[0-9]{4}")
 
-colnames(Netherlands) <- c("montant", "municipalite", "numero", "habitants", "montantparhabitant")
+colnames(Netherlands) <- c("numero", "municipalite", "montant", "habitants", "montantparhabitant")
 
-Netherlands <- data.frame(Netherlands, date = date) %>%
+Netherlands <- data.frame(Netherlands, Date = date) %>%
   filter(municipalite != "")
 
 write.csv(Netherlands, file = paste("../Data/","netherlands_",date,".csv", sep = ""))
 ```
 
+### Imported les nouveaux fichiers et y ajouter des vieux
 
 - Après, je vais importer tous les fichiers qui ont rapport aux Pays-Bas, et je les fuse tous ensemble:
+
+### Premièrement, ceux après le 17. mars
 
 ```{r}
 files <- list.files("../Data")
 files <- files[grepl("netherlands(.+)", files)]
-
-#Temporary forget 17th..
-
-files <- files[1]
 
 key <- NULL
 Netherlands <- NULL
@@ -101,6 +127,20 @@ for (i in files) {
   Netherlands <- rbind(Netherlands, key)
 }
 ```
+
+### Deuxièmement, ceux avant le 17. mars
+
+```{r}
+Before <- read_excel("../Data/corona_04032020tm16032020.xlsx", sheet = 2)
+
+Before <- Before[!is.na(Before$Gemnr),] %>%
+  pivot_longer(3:ncol(Before), names_to = "Date", values_to = "montant") %>%
+  mutate(Date = dmy(str_replace(Date, "Aantal", "")))
+
+colnames(Before) <- c("numero", "municipalite", "Date", "montant")
+
+```
+
 
 Les voilà.  Maintenant on va convertir ces informations en NUTS-niveau 1, c'est à dire le niveau nécessaire pour notre analyse géographique. 
 
@@ -149,7 +189,32 @@ rbind(
 Netherlands <- merge(Netherlands, NUTSlvl1)
 
 Netherlands <- Netherlands %>%
-  group_by(NUTS) %>%
+  group_by(NUTS, Date) %>%
+  summarise(montant = sum(montant)) %>%
+  mutate(Date = dmy(Date))
+
+```
+
+Faisons pareil pour les données d'avant le 17 mars 2020:
+
+```{r}
+Before <- Before %>%
+  merge(NUTSlvl1) %>%
+  mutate(montant = as.numeric(montant)) %>%
+  group_by(NUTS, Date) %>%
+  summarise(montant = sum(montant))
+
+Netherlands <- rbind(Netherlands, Before)
+
+```
+
+## Belgique
+La Belgique est déjà au niveau NUTS_1: on va juste filtrer une date:
+
+```{r}
+Belgium <- Belgium %>%
+  mutate(montant = as.numeric(montant)) %>%
+  group_by(NUTS_CODE, Date) %>%
   summarise(montant = sum(montant))
 
 ```
@@ -171,14 +236,33 @@ write.csv(conversion, "../Data/conversion.csv")
 #Occitanie est LANGUEDOC-ROUSSILLON-MIDI-PYRÉNÉES est FRJ
 
 France <- France %>%
-  filter(Date == "2020-03-16") %>%
   merge(conversion) %>%
-  group_by(NUTS_CODE) %>%
+  group_by(NUTS_CODE, Date) %>%
   summarise(montant = sum(montant))
 
 ``` 
 
 Ainsi on a converti tout ce qu'il faut pour conduire une analyse géographique. 
+
+
+# Selection de la date
+
+Au commencement de ce fichier Markdown, on a paramétrisé une date specifique (`r datum`), que nous allons maintenant utiliser pour concentrer les dataframes sur une (et seulement une date) pour générer une image statique. 
+
+```{r}
+write.csv(Netherlands, "../Data/Shiny_nl.csv")
+write.csv(Belgium, "../Data/Shiny_be.csv")
+write.csv(France, "../Data/Shiny_fr.csv")
+
+countries <- list(Netherlands, Belgium, France) %>%
+  lapply(filter, Date == datum)
+
+Netherlands <- countries[[1]]
+Belgium <- countries[[2]]
+France <- countries[[3]]
+```
+
+Plus tard, il va y avoir un outil qui va vous permettre de spécifier une séquence de dates et de générer une visualisation du développement du virus au cours de cette période. 
 
 # Les analyses géographiques 
 
@@ -192,7 +276,14 @@ Europe <- readOGR(layer = "NUTS_RG_03M_2016_3035_LEVL_1",
 
 Europe <- sp::merge(Europe, Netherlands, by.x = "NUTS_ID", by.y = "NUTS")
 
-Europe <- sp::merge(Europe, France, by.x = "NUTS_ID", by.y = "NUTS_CODE" )
+Europe <- sp::merge(Europe, France, by.x = "NUTS_ID", by.y = "NUTS_CODE")
+
+Europe@data <- Europe@data %>%
+  mutate(montant = ifelse(is.na(montant.x), montant.y, montant.x)) %>%
+  select(-montant.x, -montant.y)
+
+#Ajouter la Belgique
+Europe <- sp::merge(Europe, Belgium, by.x = "NUTS_ID", by.y = "NUTS_CODE")
 
 Europe@data <- Europe@data %>%
   mutate(montant = ifelse(is.na(montant.x), montant.y, montant.x)) %>%
@@ -201,11 +292,9 @@ Europe@data <- Europe@data %>%
 m1 <- tm_shape(Europe) + tm_polygons(col = "montant", 
                                palette = "viridis",
                                showNA = FALSE,
-                               breaks = c(0,1,10,100,200,500,1000,2000,Inf))
+                               breaks = c(0,50,100,200,500,1000,Inf))
 m2 <- tmap_leaflet(m1)
-
 setView(m2, 4.8945, 52.3667, zoom = 5)
-
 
 ```
 
