@@ -122,7 +122,7 @@ files <- files[grepl("netherlands(.+)", files)]
 key <- NULL
 Netherlands <- NULL
 for (i in files) {
-  key <- read.csv(paste("../Data/",files, sep = "")) %>%
+  key <- read.csv(paste("../Data/",i, sep = "")) %>%
   select(-1)
   Netherlands <- rbind(Netherlands, key)
 }
