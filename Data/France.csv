@@ -1,0 +1,241 @@
+"","Date","departement","montant"
+"1",2020-03-04,"Auvergne-Rhône-Alpes",49
+"2",2020-03-04,"Bourgogne-Franche-Comté",16
+"3",2020-03-04,"Bretagne",23
+"4",2020-03-04,"Centre-Val de Loire",0
+"5",2020-03-04,"Corse",0
+"6",2020-03-04,"Grand Est",38
+"7",2020-03-04,"Hauts-de-France",65
+"8",2020-03-04,"Ile-de-France",55
+"9",2020-03-04,"Normandie",2
+"10",2020-03-04,"Nouvelle-Aquitaine",5
+"11",2020-03-04,"Occitanie",9
+"12",2020-03-04,"Pays de la Loire",7
+"13",2020-03-04,"Provence-Alpes-Côte d’Azur",13
+"14",2020-03-04,"Guadeloupe",3
+"15",2020-03-04,"Saint-Barthélémy",0
+"16",2020-03-04,"Saint-Martin",0
+"17",2020-03-04,"Guyane",0
+"18",2020-03-04,"Martinique",0
+"19",2020-03-04,"Mayotte",0
+"20",2020-03-04,"La Réunion",0
+"21",2020-03-05,"Auvergne-Rhône-Alpes",64
+"22",2020-03-05,"Bourgogne-Franche-Comté",39
+"23",2020-03-05,"Bretagne",29
+"24",2020-03-05,"Centre-Val de Loire",2
+"25",2020-03-05,"Corse",3
+"26",2020-03-05,"Grand Est",77
+"27",2020-03-05,"Hauts-de-France",74
+"28",2020-03-05,"Ile-de-France",76
+"29",2020-03-05,"Normandie",6
+"30",2020-03-05,"Nouvelle-Aquitaine",8
+"31",2020-03-05,"Occitanie",11
+"32",2020-03-05,"Pays de la Loire",8
+"33",2020-03-05,"Provence-Alpes-Côte d’Azur",18
+"34",2020-03-05,"Guadeloupe",3
+"35",2020-03-05,"Saint-Barthélémy",0
+"36",2020-03-05,"Saint-Martin",0
+"37",2020-03-05,"Guyane",5
+"38",2020-03-05,"Martinique",0
+"39",2020-03-05,"Mayotte",0
+"40",2020-03-05,"La Réunion",0
+"41",2020-03-06,"Auvergne-Rhône-Alpes",75
+"42",2020-03-06,"Bourgogne-Franche-Comté",78
+"43",2020-03-06,"Bretagne",32
+"44",2020-03-06,"Centre-Val de Loire",11
+"45",2020-03-06,"Corse",3
+"46",2020-03-06,"Grand Est",136
+"47",2020-03-06,"Hauts-de-France",97
+"48",2020-03-06,"Ile-de-France",89
+"49",2020-03-06,"Normandie",11
+"50",2020-03-06,"Nouvelle-Aquitaine",11
+"51",2020-03-06,"Occitanie",18
+"52",2020-03-06,"Pays de la Loire",16
+"53",2020-03-06,"Provence-Alpes-Côte d’Azur",26
+"54",2020-03-06,"Guadeloupe",0
+"55",2020-03-06,"Saint-Barthélémy",1
+"56",2020-03-06,"Saint-Martin",2
+"57",2020-03-06,"Guyane",5
+"58",2020-03-06,"Martinique",2
+"59",2020-03-06,"Mayotte",0
+"60",2020-03-06,"La Réunion",0
+"61",2020-03-07,"Auvergne-Rhône-Alpes",102
+"62",2020-03-07,"Bourgogne-Franche-Comté",129
+"63",2020-03-07,"Bretagne",40
+"64",2020-03-07,"Centre-Val de Loire",16
+"65",2020-03-07,"Corse",5
+"66",2020-03-07,"Grand Est",250
+"67",2020-03-07,"Hauts-de-France",173
+"68",2020-03-07,"Ile-de-France",104
+"69",2020-03-07,"Normandie",11
+"70",2020-03-07,"Nouvelle-Aquitaine",17
+"71",2020-03-07,"Occitanie",36
+"72",2020-03-07,"Pays de la Loire",18
+"73",2020-03-07,"Provence-Alpes-Côte d’Azur",38
+"74",2020-03-07,"Guadeloupe",0
+"75",2020-03-07,"Saint-Barthélémy",1
+"76",2020-03-07,"Saint-Martin",2
+"77",2020-03-07,"Guyane",5
+"78",2020-03-07,"Martinique",2
+"79",2020-03-07,"Mayotte",0
+"80",2020-03-07,"La Réunion",0
+"81",2020-03-10,"Auvergne-Rhône-Alpes",249
+"82",2020-03-10,"Bourgogne-Franche-Comté",123
+"83",2020-03-10,"Bretagne",83
+"84",2020-03-10,"Centre-Val de Loire",19
+"85",2020-03-10,"Corse",42
+"86",2020-03-10,"Grand Est",489
+"87",2020-03-10,"Hauts-de-France",249
+"88",2020-03-10,"Ile-de-France",468
+"89",2020-03-10,"Normandie",40
+"90",2020-03-10,"Nouvelle-Aquitaine",57
+"91",2020-03-10,"Occitanie",70
+"92",2020-03-10,"Pays de la Loire",31
+"93",2020-03-10,"Provence-Alpes-Côte d’Azur",110
+"94",2020-03-10,"Guadeloupe",0
+"95",2020-03-10,"Saint-Barthélémy",1
+"96",2020-03-10,"Saint-Martin",2
+"97",2020-03-10,"Guyane",5
+"98",2020-03-10,"Martinique",3
+"99",2020-03-10,"Mayotte",0
+"100",2020-03-10,"La Réunion",0
+"101",2020-03-11,"Auvergne-Rhône-Alpes",264
+"102",2020-03-11,"Bourgogne-Franche-Comté",155
+"103",2020-03-11,"Bretagne",94
+"104",2020-03-11,"Centre-Val de Loire",20
+"105",2020-03-11,"Corse",51
+"106",2020-03-11,"Grand Est",578
+"107",2020-03-11,"Hauts-de-France",263
+"108",2020-03-11,"Ile-de-France",492
+"109",2020-03-11,"Normandie",54
+"110",2020-03-11,"Nouvelle-Aquitaine",66
+"111",2020-03-11,"Occitanie",87
+"112",2020-03-11,"Pays de la Loire",34
+"113",2020-03-11,"Provence-Alpes-Côte d’Azur",111
+"114",2020-03-11,"Guadeloupe",0
+"115",2020-03-11,"Saint-Barthélémy",1
+"116",2020-03-11,"Saint-Martin",2
+"117",2020-03-11,"Guyane",5
+"118",2020-03-11,"Martinique",3
+"119",2020-03-11,"Mayotte",0
+"120",2020-03-11,"La Réunion",1
+"121",2020-03-12,"Auvergne-Rhône-Alpes",329
+"122",2020-03-12,"Bourgogne-Franche-Comté",219
+"123",2020-03-12,"Bretagne",117
+"124",2020-03-12,"Centre-Val de Loire",30
+"125",2020-03-12,"Corse",64
+"126",2020-03-12,"Grand Est",699
+"127",2020-03-12,"Hauts-de-France",349
+"128",2020-03-12,"Ile-de-France",577
+"129",2020-03-12,"Normandie",68
+"130",2020-03-12,"Nouvelle-Aquitaine",87
+"131",2020-03-12,"Occitanie",133
+"132",2020-03-12,"Pays de la Loire",41
+"133",2020-03-12,"Provence-Alpes-Côte d’Azur",147
+"134",2020-03-12,"Guadeloupe",0
+"135",2020-03-12,"Saint-Barthélémy",1
+"136",2020-03-12,"Saint-Martin",2
+"137",2020-03-12,"Guyane",6
+"138",2020-03-12,"Martinique",4
+"139",2020-03-12,"Mayotte",0
+"140",2020-03-12,"La Réunion",3
+"141",2020-03-13,"Auvergne-Rhône-Alpes",416
+"142",2020-03-13,"Bourgogne-Franche-Comté",272
+"143",2020-03-13,"Bretagne",155
+"144",2020-03-13,"Centre-Val de Loire",33
+"145",2020-03-13,"Corse",85
+"146",2020-03-13,"Grand Est",911
+"147",2020-03-13,"Hauts-de-France",397
+"148",2020-03-13,"Ile-de-France",721
+"149",2020-03-13,"Normandie",97
+"150",2020-03-13,"Nouvelle-Aquitaine",114
+"151",2020-03-13,"Occitanie",172
+"152",2020-03-13,"Pays de la Loire",55
+"153",2020-03-13,"Provence-Alpes-Côte d’Azur",212
+"154",2020-03-13,"Guadeloupe",1
+"155",2020-03-13,"Saint-Barthélémy",1
+"156",2020-03-13,"Saint-Martin",2
+"157",2020-03-13,"Guyane",6
+"158",2020-03-13,"Martinique",6
+"159",2020-03-13,"Mayotte",0
+"160",2020-03-13,"La Réunion",5
+"161",2020-03-14,"Auvergne-Rhône-Alpes",454
+"162",2020-03-14,"Bourgogne-Franche-Comté",339
+"163",2020-03-14,"Bretagne",182
+"164",2020-03-14,"Centre-Val de Loire",54
+"165",2020-03-14,"Corse",106
+"166",2020-03-14,"Grand Est",1085
+"167",2020-03-14,"Hauts-de-France",466
+"168",2020-03-14,"Ile-de-France",949
+"169",2020-03-14,"Normandie",127
+"170",2020-03-14,"Nouvelle-Aquitaine",130
+"171",2020-03-14,"Occitanie",214
+"172",2020-03-14,"Pays de la Loire",82
+"173",2020-03-14,"Provence-Alpes-Côte d’Azur",281
+"174",2020-03-14,"Guadeloupe",3
+"175",2020-03-14,"Saint-Barthélémy",1
+"176",2020-03-14,"Saint-Martin",2
+"177",2020-03-14,"Guyane",7
+"178",2020-03-14,"Martinique",10
+"179",2020-03-14,"Mayotte",1
+"180",2020-03-14,"La Réunion",6
+"181",2020-03-15,"Auvergne-Rhône-Alpes",523
+"182",2020-03-15,"Bourgogne-Franche-Comté",412
+"183",2020-03-15,"Bretagne",207
+"184",2020-03-15,"Centre-Val de Loire",71
+"185",2020-03-15,"Corse",115
+"186",2020-03-15,"Grand Est",1378
+"187",2020-03-15,"Hauts-de-France",507
+"188",2020-03-15,"Ile-de-France",1209
+"189",2020-03-15,"Normandie",143
+"190",2020-03-15,"Nouvelle-Aquitaine",144
+"191",2020-03-15,"Occitanie",243
+"192",2020-03-15,"Pays de la Loire",98
+"193",2020-03-15,"Provence-Alpes-Côte d’Azur",330
+"194",2020-03-15,"Guadeloupe",6
+"195",2020-03-15,"Saint-Barthélémy",3
+"196",2020-03-15,"Saint-Martin",2
+"197",2020-03-15,"Guyane",7
+"198",2020-03-15,"Martinique",15
+"199",2020-03-15,"Mayotte",1
+"200",2020-03-15,"La Réunion",9
+"201",2020-03-16,"Auvergne-Rhône-Alpes",618
+"202",2020-03-16,"Bourgogne-Franche-Comté",507
+"203",2020-03-16,"Bretagne",233
+"204",2020-03-16,"Centre-Val de Loire",90
+"205",2020-03-16,"Corse",126
+"206",2020-03-16,"Grand Est",1543
+"207",2020-03-16,"Hauts-de-France",585
+"208",2020-03-16,"Ile-de-France",1762
+"209",2020-03-16,"Normandie",156
+"210",2020-03-16,"Nouvelle-Aquitaine",178
+"211",2020-03-16,"Occitanie",262
+"212",2020-03-16,"Pays de la Loire",108
+"213",2020-03-16,"Provence-Alpes-Côte d’Azur",405
+"214",2020-03-16,"Guadeloupe",18
+"215",2020-03-16,"Saint-Barthélémy",3
+"216",2020-03-16,"Saint-Martin",2
+"217",2020-03-16,"Guyane",11
+"218",2020-03-16,"Martinique",16
+"219",2020-03-16,"Mayotte",1
+"220",2020-03-16,"La Réunion",9
+"221",2020-03-17,"Auvergne-Rhône-Alpes",710
+"222",2020-03-17,"Bourgogne-Franche-Comté",549
+"223",2020-03-17,"Bretagne",247
+"224",2020-03-17,"Centre-Val de Loire",103
+"225",2020-03-17,"Corse",145
+"226",2020-03-17,"Grand Est",1820
+"227",2020-03-17,"Hauts-de-France",612
+"228",2020-03-17,"Ile-de-France",2177
+"229",2020-03-17,"Normandie",174
+"230",2020-03-17,"Nouvelle-Aquitaine",200
+"231",2020-03-17,"Occitanie",311
+"232",2020-03-17,"Pays de la Loire",126
+"233",2020-03-17,"Provence-Alpes-Côte d’Azur",478
+"234",2020-03-17,"Guadeloupe",27
+"235",2020-03-17,"Saint-Barthélémy",3
+"236",2020-03-17,"Saint-Martin",3
+"237",2020-03-17,"Guyane",11
+"238",2020-03-17,"Martinique",19
+"239",2020-03-17,"Mayotte",3
+"240",2020-03-17,"La Réunion",12
