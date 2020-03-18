@@ -27,7 +27,6 @@ library(magrittr)
 library(lubridate)
 library(glogis)
 library(gridExtra)
-library(grid)
 
 
 x <- c("ggmap", "rgdal", "rgeos", "maptools", "tmap")
@@ -36,12 +35,17 @@ lapply(x, library, character.only = TRUE)
 
 Hier eerst drie datasets van <https://github.com/CSSEGISandData/COVID-19>. 
 
+```{r}
 Confirmed <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv", colClasses = )
 
 Deaths <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv")
 
 Recovered <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv")
+```
 
+Nettoyons les données!
+
+```{r cars}
 Corona <- list(Confirmed, Deaths, Recovered)
 
 a <- ncol(Confirmed)
@@ -52,6 +56,10 @@ Corona <- lapply(Corona, pivot_longer, 5:a)
 Analysis <- lapply(Corona, mutate, name = str_replace(name, "X", ""))
 Analysis <- lapply(Analysis, mutate, name = mdy(name))
 
+```
+
+
+```{r}
 Alltogether <- merge(Analysis[[1]], Analysis[[2]], 
               by = c('Province.State', 
                      'Country.Region', 
@@ -93,52 +101,125 @@ PerCountry <- merge(PerCountry, firstday)
 
 PerCountry <- PerCountry %>%
   mutate(sincefirstday = name - firstday)
+```
 
-day100 <- PerCountry %>%
-  group_by(Country.Region) %>%
-  filter(Confirmed > 99) %>%
-  mutate(daymore100 = min(name)) %>%
-  select(Country.Region, daymore100) %>%
-  distinct()
+Les premières analyses!
 
-PerCountry <- left_join(PerCountry, day100)
 
-PerCountry <- PerCountry %>%
-  mutate(sincehunday = name - daymore100)
+```{r}
 
-landen <- c("Italy", "Belgium" , "France", "Spain", "Germany", "United Kingdom", "Netherlands")
+## Grafieken
+par(mfrow=c(1,2))
 
-p1 <- PerCountry %>% 
-  filter(Country.Region %in% landen, sincehunday > 0) %>%
-  ggplot(aes(x = sincehunday, 
+PerCountry %>%
+  filter(sincefirstday > 1, 
+         Country.Region == "Italy"| Country.Region == "Netherlands") %>%
+  ggplot(aes(x = sincefirstday, 
+             y = Deaths, 
+             color = Country.Region)) + geom_line()
+
+PerCountry %>%
+  filter(sincefirstday > 1, 
+         Country.Region == "Netherlands" | Country.Region == "Belgium") %>%
+  ggplot(aes(x = sincefirstday, 
+             y = Deaths, 
+             color = Country.Region)) + geom_line()
+
+p1 <- PerCountry %>%
+  filter(sincefirstday > 1, 
+         Country.Region == "Italy"| Country.Region == "Netherlands")%>%
+  ggplot(aes(x = sincefirstday, 
              y = Confirmed, 
-             color = Country.Region)) + geom_line() + scale_y_continuous(trans = 'log10') + labs(x="Days passed since 100th case", y = "Confirmed Cases (in log10)")
-
-p2<- PerCountry %>%
-  filter(Country.Region %in% landen, sincehunday > 0) %>%
-  ggplot(aes(x = sincehunday, 
-             y = Confirmed, 
-             color = Country.Region)) + geom_line() + labs(x="Days passed since 100th case", y = "Confirmed Cases")
-
-grid.arrange(p1,p2, ncol = 2)
-
+             color = Country.Region)) + geom_line() + scale_x_continuous(limits=c(0,50)) + scale_y_continuous(limits=c(0,25000))  
 
 p2 <- PerCountry %>%
   filter(sincefirstday > 1, 
+         Country.Region == "Netherlands" | Country.Region == "Belgium") %>%
+  ggplot(aes(x = sincefirstday, 
+             y = Confirmed, 
+             color = Country.Region)) + geom_line() + scale_x_continuous(limits=c(0,50)) + scale_y_continuous(limits=c(0,5000))  
+
+p3 <- PerCountry %>%
+  filter(sincefirstday > 1, 
          Country.Region == "Italy" | Country.Region == "Belgium") %>%
   ggplot(aes(x = sincefirstday, 
-             y = Deaths, 
-             color = Country.Region)) + geom_line()
+             y = Confirmed, 
+             color = Country.Region)) + geom_line() + scale_x_continuous(limits=c(0,50)) + scale_y_continuous(limits=c(0,25000))  
 
-p3 <-  PerCountry %>%
-  filter(sincefirstday > 1, 
-         Country.Region == "Belgium" | Country.Region == "Netherlands") %>%
-  ggplot(aes(x = sincefirstday, 
-             y = Deaths, 
-             color = Country.Region)) + geom_line()
+grid.arrange(p1, p2, p3, ncol =3)
 
+# Modellen
+#1 Log-Model
+
+gf <- PerCountry %>%
+filter(sincefirstday >0,
+       Country.Region == "Italy") %>%
+  select(Deaths, sincefirstday) %>%
+  arrange(sincefirstday) %>%
+  mutate(sincefirstday = as.numeric(sincefirstday))
+
+gf %>%
+  mutate()
 
 glm_simple <-glm(data = gf, Deaths ~ sincefirstday, family = poisson(link = "log"))
+
+#2 Andere-modellen
+# Toepassing SSasymy op CH
+CHConfirmed <- subset(PerCountry, Country.Region == "China", select = c("name", "Confirmed"))
+
+## Data variabele omzetten naar integer (werk niet met data)
+DaysPassed <- seq(1:53)
+CH <- cbind(CHConfirmed, DaysPassed)
+CH <- select(CH,2:3)              
+
+## Model toepassen en plotten 
+ggplot(data=CH, aes(x=DaysPassed, y=Confirmed)) +
+geom_point() +
+geom_smooth(color="Blue", se=T) +
+geom_smooth(method="nls", formula=y~SSasymp(x, Asym, R0, lrc), color="red", se=F, fullrange=T) +
+scale_x_continuous(limits=c(0,100))
+
+# Toepassing TBATS op BE: 30 en 60 dagen
+
+BEConfirmed <- subset(PerCountry, Country.Region == "Belgium", select = c("name", "Confirmed"))
+
+BEL30T <- BEConfirmed %>%
+select(2) %>%
+ts() %>%
+tbats() %>%
+forecast(h = 30)
+
+BEL60T <- BEConfirmed %>%
+select(2) %>%
+ts() %>%
+tbats() %>%
+forecast(h = 60)
+
+
+# Toepassing TBATS op NL: 30 en 60 dagen
+
+NLConfirmed <- subset(PerCountry, Country.Region == "Netherlands", select = c("name", "Confirmed"))
+
+NL30 <- NLConfirmed %>%
+select(2) %>%
+ts() %>%
+tbats() %>%
+forecast(h = 30)
+
+NL60 <- NLConfirmed %>%
+select(2) %>%
+ts() %>%
+tbats() %>%
+forecast(h = 60)
+
+# Alles even plotten
+
+par(mfrow=c(2,2))
+plot(BEL30) 
+plot(BEL60) 
+plot(NL30) 
+plot(NL60) 
+
 
 ```
 
