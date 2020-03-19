@@ -82,6 +82,3 @@ BENEFRUSA
 GDPC2 %>%
   ggplot(aes(x = year, y = `GDP per Capita`, color = `country name`, group = `country name`)) + geom_line() + facet_wrap(~ `country name`) + scale_x_discrete(c1900,2000,100)
 BENEFRUS
-
-
-

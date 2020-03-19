@@ -29,7 +29,7 @@ x <- c("ggmap", "rgdal", "rgeos", "maptools", "tmap")
 lapply(x, library, character.only = TRUE)
 
 #Ici, il faut choisir la data à laquelle on va construire la carte. 
-datum <- as.Date("2020-03-18")
+datum <- Sys.Date() -1
 ```
 
 # Introduction
