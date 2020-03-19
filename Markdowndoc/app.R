@@ -26,7 +26,7 @@ ui <- bootstrapPage(
     tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
     leafletOutput("map", width = "100%", height = "100%"),
     absolutePanel(bottom = 10, right = 10,
-                  sliderInput("Date", "Select a Date", 
+                  sliderInput("Date", "Sélectionnez une date", 
                               min = ymd("2020-03-01"),
                               max = today(),
                               value = ymd("2020-03-15")
@@ -89,7 +89,9 @@ server <- function(input, output, session) {
                             style = list("font-weight" = "normal", padding = "3px 8px"),
                             textsize = "15px",
                             direction = "auto")
-            )
+            ) %>%
+          clearControls() %>%
+          addLegend(data = filteredData(), pal = pal, values = ~montant, opacity = 0.7, title = "Cas confirmés", position = "bottomleft")
       
     })
     
