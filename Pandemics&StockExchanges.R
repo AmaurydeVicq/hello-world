@@ -21,9 +21,12 @@ SPC <- read_excel("SPC.xlsx")
 AEX <- read_excel("AEX.xlsx")
 GDPC <- read_excel("GDPperCapita.xlsx")
 Life <- read_excel("Life.xlsx")
+MLife <- read_excel("MLife.xlsx")
+TP <- read_excel("TP.xlsx")
 BondYield <- read_excel("BondYield.xlsx")
 RealWage <- read_excel("RealWage.xlsx")
 Debt <- read_excel("Debt.xlsx")
+CO2 <- read_excel("CO2.xlsx")
 
 # Amend Mortality data
 BE_DR$Year <- as.integer(BE_DR$Year) 
@@ -63,35 +66,60 @@ BENEFRUSA <- rbind(BE,NL,FR,USA)
 
 # Amend other data
 GDPC2 <- GDPC %>% 
-  filter(`country name` == "Belgium" | `country name` == "France" | `country name` == "Netherlands" | `country name` == "Germany" | `country name` == "United States") %>%
+  filter(`country name` == "Belgium" | `country name` == "France" | `country name` == "Netherlands" | `country name` == "Germany" | `country name` == "United States" | `country name` == "Italy" | `country name` == "United Kingdom") %>%
   pivot_longer(-`country name`,names_to = "year", values_to = "GDP per Capita") %>%
   filter(year >= 1900) 
 GDPC2 <- GDPC2[-1,]
 
 
 RealWage2 <- RealWage %>%
-  filter(`country name` == "Belgium" | `country name` == "France" | `country name` == "Netherlands" | `country name` == "Germany" | `country name` == "United States") %>%
-  pivot_longer(-`country name`,names_to = "year", values_to = "Real Wage") %>%
+  filter(`country name` == "Belgium" | `country name` == "France" | `country name` == "Netherlands" | `country name` == "Germany" | `country name` == "United States"  | `country name` == "Italy" | `country name` == "United Kingdom") %>%
+  pivot_longer(-`country name`, names_to = "year", values_to = "Real Wage") %>%
   filter(year >= 1900)
-RealWage2 <- RealWage[-1,]  
+RealWage2 <- RealWage2[-1,]  
+RealWage2 <- na.omit(RealWage2)
 
 Life2 <- Life %>%
-  filter(`country name` == "Belgium" | `country name` == "France" | `country name` == "Netherlands" | `country name` == "Germany" | `country name` == "United States") %>%
+  filter(`country name` == "Belgium" | `country name` == "France" | `country name` == "Netherlands" | `country name` == "Germany" | `country name` == "United States"  | `country name` == "Italy" | `country name` == "United Kingdom") %>%
   pivot_longer(-`country name`,names_to = "year", values_to = "LifeEx") %>%
   filter(year >= 1900)
 Life2 <- Life2[-1,]  
+Life2 <- na.omit(Life2)
+
+MLife2 <- MLife %>%
+  filter(`country name` == "Belgium" | `country name` == "France" | `country name` == "Netherlands" | `country name` == "Germany" | `country name` == "United States"  | `country name` == "Italy" | `country name` == "United Kingdom") %>%
+  pivot_longer(-`country name`,names_to = "year", values_to = "LifeEx") %>%
+  filter(year >= 1900)
+MLife2 <- MLife2[-1,]  
+MLife2 <- na.omit(MLife2)
 
 BondYield2 <- BondYield %>%
-  filter(`country name` == "Belgium" | `country name` == "France" | `country name` == "Netherlands" | `country name` == "Germany" | `country name` == "United States") %>%
+  filter(`country name` == "Belgium" | `country name` == "France" | `country name` == "Netherlands" | `country name` == "Germany" | `country name` == "United States"  | `country name` == "Italy" | `country name` == "United Kingdom") %>%
   pivot_longer(-`country name`,names_to = "year", values_to = "Yield") %>%
   filter(year >= 1900)
 BondYield2 <- BondYield2[-1,]
+BondYield2 <- na.omit(BondYield2)
 
 Debt2 <- Debt %>%
-  filter(`country name` == "Belgium" | `country name` == "France" | `country name` == "Netherlands" | `country name` == "Germany" | `country name` == "United States") %>%
+  filter(`country name` == "Belgium" | `country name` == "France" | `country name` == "Netherlands" | `country name` == "Germany" | `country name` == "United States"  | `country name` == "Italy" | `country name` == "United Kingdom") %>%
   pivot_longer(-`country name`,names_to = "year", values_to = "Debt") %>%
   filter(year >= 1900)
-Debt2 <- Debt2[-1] 
+Debt2 <- Debt2[-1,] 
+Debt2 <- na.omit(Debt2) 
+
+TP2 <- TP %>%
+  filter(`country name` == "Belgium" | `country name` == "France" | `country name` == "Netherlands" | `country name` == "Germany" | `country name` == "United States"  | `country name` == "Italy" | `country name` == "United Kingdom") %>%
+  pivot_longer(-`country name`,names_to = "year", values_to = "TP") %>%
+  filter(year >= 1900)
+TP2 <- TP2[-1,] 
+TP2 <- na.omit(TP2) 
+
+CO2 <- CO2 %>%
+  filter(`country name` == "Belgium" | `country name` == "France" | `country name` == "Netherlands" | `country name` == "Germany" | `country name` == "Italy" | `country name` == "United Kingdom") %>%
+  pivot_longer(-`country name`,names_to = "year", values_to = "CO2") %>%
+  filter(year >= 1900)
+CO2 <- CO2[-1,] 
+CO2 <- na.omit(CO2)
 
 
 # Plots
@@ -105,12 +133,32 @@ BENEFRUSA %>%
   ggplot(aes(x = Year, y = Total, color = country, group = country)) + geom_line() + facet_wrap(~ country)
 
 GDPC2 %>%
-  ggplot(aes(x = year, y = `GDP per Capita`, color = `country name`, group = `country name`)) + geom_line() + facet_wrap(~ `country name`) 
+  mutate(year = as.numeric(year)) %>%
+  filter(year < 1930)%>%
+  ggplot(aes(x = year, y = `GDP per Capita`, color = `country name`, group = `country name`)) + geom_line() + facet_wrap(~ `country name`, scales = "free") + ggtitle("GDP per Capita")
 
 Life2 %>%
-  ggplot(aes(x = year, y = `LifeEx`, color = `country name`, group = `country name`)) + geom_line() + facet_wrap(~ `country name`)
+  mutate(year = as.numeric(year)) %>%
+  filter(year < 1930) %>%
+  ggplot(aes(x = year, y = `LifeEx`, color = `country name`, group = `country name`)) + geom_line() + facet_wrap(~ `country name`, scales = "free") + ggtitle("Life Expectancy at Birth")
 
 BondYield2 %>%
-  ggplot(aes(x = year, y = `Yield`, color = `country name`, group = `country name`)) + geom_line() + facet_wrap(~ `country name`)
-  
+  mutate(year = as.numeric(year)) %>%
+  filter(year < 1930) %>%
+  ggplot(aes(x = year, y = `Yield`, color = `country name`, group = `country name`)) + geom_line() + facet_wrap(~ `country name`, scales = "free") + ggtitle("Government Bond Yield")
 
+RealWage2 %>%
+  mutate(year = as.numeric(year)) %>%
+  filter(year < 1930) %>%
+  ggplot(aes(x = year, y = `Real Wage`, color = `country name`, group = `country name`)) + geom_line() + facet_wrap(~ `country name`, scales = "free") + ggtitle("Real Wages")
+
+Debt2 %>%
+  mutate(year = as.numeric(year)) %>%
+  filter(year < 1930) %>%
+  ggplot(aes(x = year, y = `Debt`, color = `country name`, group = `country name`)) + geom_line() + facet_wrap(~ `country name`, scales = "free") + ggtitle("Total Gross Central Government Debt as % of GDP")
+
+
+CO2 %>%
+  mutate(year = as.numeric(year)) %>%
+  filter(year < 1930) %>%
+  ggplot(aes(x = year, y = `CO2`, color = `country name`, group = `country name`)) + geom_line() + facet_wrap(~ `country name`, scales = "free") + ggtitle("Total CO2 emission")
