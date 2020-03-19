@@ -1,4 +1,3 @@
-West Germany, Death rates (period 1x1), 	Last modified: 17 Dec 2018;  Methods Protocol: v6 (2017)
   Year          Age             Female            Male           Total
   1956           0             0.036081        0.045558        0.040943
   1956           1             0.002406        0.003064        0.002743
