@@ -14,9 +14,11 @@ Belgium <- read_csv("../Data/Shiny_be.csv") %>%
     select(-1)
 France <- read_csv("../Data/Shiny_fr.csv") %>%
     select(-1)
+Germany <- read_csv("../Data/Shiny_de.csv") %>%
+  select(-1)
 
 colnames(Netherlands) <- c("NUTS_CODE", "Date", "montant")
-countries <- rbind(Netherlands ,Belgium, France) 
+countries <- rbind(Netherlands ,Belgium, France, Germany) 
 
 Europe <- readOGR(layer = "NUTS_RG_03M_2016_4326_LEVL_1", dsn = "../Data")
 bins <- c(0, 10, 20, 50, 100, 200, 500, 1000, Inf)
