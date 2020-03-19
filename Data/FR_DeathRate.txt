@@ -1,4 +1,3 @@
-France, Total Population, Death rates (period 1x1), 	Last modified: 01 Nov 2019;  Methods Protocol: v6 (2017)
   Year          Age             Female            Male           Total
   1816           0             0.186986        0.222931        0.205344
   1816           1             0.046702        0.046670        0.046685

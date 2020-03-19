@@ -1,5 +1,4 @@
-﻿Netherlands, Death rates (period 1x1), 	Last modified: 10 May 2018;  Methods Protocol: v6 (2017)
-  Year          Age             Female            Male           Total
+﻿  Year          Age             Female            Male           Total
   1850           0             0.203847        0.243150        0.223855
   1850           1             0.064087        0.067497        0.065806
   1850           2             0.032135        0.033367        0.032753
