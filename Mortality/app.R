@@ -16,11 +16,11 @@ library(ggplot2)
 library(shiny)
 
 # Load in data
-BE_DR <-  read.csv("./Data/BE_DeathRate.txt", sep="")
-NL_DR <- read_excel("./Data/NL_DR.xlsx")
-FR_DR <-  read.csv("./Data/FR_DeathRate.txt", sep="")
-DE_DR <-  read.csv("./Data/DE_DeathRate.txt", sep="")
-USA_DR <-  read.csv("./Data/USA_DeathRate.txt", sep="")
+BE_DR <-  read.csv("../Data/BE_DeathRate.txt", sep="")
+NL_DR <- read_excel("../Data/NL_DR.xlsx")
+FR_DR <-  read.csv("../Data/FR_DeathRate.txt", sep="")
+DE_DR <-  read.csv("../Data/DE_DeathRate.txt", sep="")
+USA_DR <-  read.csv("../Data/USA_DeathRate.txt", sep="")
 
 
 BE <- BE_DR %>% 
