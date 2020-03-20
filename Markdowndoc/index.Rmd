@@ -226,7 +226,7 @@ Europe <- sp::merge(Europe, countrycodes,
 
 EuropeCorona <- PerCountry %>%
   filter(Country.Region %in% countrycodes$name.text) %>%
-  filter(name == Sys.Date() -2)
+  filter(name == Sys.Date() -1)
 
 Europe <- sp::merge(Europe, EuropeCorona, 
                     by.x = "name.text", 
