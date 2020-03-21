@@ -315,6 +315,31 @@ colnames(Italy) <- c("Date", "NUTS_CODE", "montant")
 ```
 
 
+## Danemark, République Tchèque, Suisse, Irlande
+
+Et maintenant quelques pays qui n'ont q'une région: le Danemark:
+
+```{r}
+
+jeveux <- c("Denmark", "Czechia", "Switzerland", "Ireland")
+conversiontable <- data.frame(NUTS_CODE = c("CZ0", "DK0", "CH0", "IE0"), Country.Region = c("Czechia","Denmark","Switzerland", "Ireland"))
+
+pays <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv") %>%
+  select(-1)
+
+finalpays <- pays %>%
+  pivot_longer(4:ncol(pays), names_to = "Date", values_to = "montant") %>%
+  mutate(Date = mdy(str_replace(Date, "X", ""))) %>%
+  filter(Country.Region %in% jeveux) %>%
+  select(-2,-3) %>%
+  merge(conversiontable) %>%
+  group_by(Country.Region, Date, NUTS_CODE) %>%
+  summarise(montant = sum(montant)) %>%
+  ungroup() %>%
+  select(NUTS_CODE, Date, montant)
+
+```
+
 Ainsi on a converti tout ce qu'il faut pour conduire une analyse géographique. 
 
 
@@ -327,14 +352,16 @@ write.csv(Netherlands, "../Data/Shiny_nl.csv")
 write.csv(Belgium, "../Data/Shiny_be.csv")
 write.csv(France, "../Data/Shiny_fr.csv")
 write.csv(Italy, "../Data/Shiny_it.csv")
+write.csv(finalpays, "../Data/Shiny_ap.csv")
 
-countries <- list(Netherlands, Belgium, France, Italy) %>%
+countries <- list(Netherlands, Belgium, France, Italy, finalpays) %>%
   lapply(filter, Date == datum)
 
 Netherlands <- countries[[1]]
 Belgium <- countries[[2]]
 France <- countries[[3]]
 Italy <- countries[[4]]
+Autrespays <- countries[[5]]
 ```
 
 Plus tard, il va y avoir un outil qui va vous permettre de spécifier une séquence de dates et de générer une visualisation du développement du virus au cours de cette période. 
@@ -370,6 +397,8 @@ Europe <- sp::merge(Europe, Italy, by.x = "NUTS_ID", by.y = "NUTS_CODE")
 Europe@data <- Europe@data %>%
   mutate(montant = ifelse(is.na(montant.x), montant.y, montant.x)) %>%
   select(-montant.x, -montant.y, -Date)
+
+#Ajouter les autres pays (plus tard)
 
 m1 <- tm_shape(Europe) + tm_polygons(col = "montant", 
                                palette = "viridis",
