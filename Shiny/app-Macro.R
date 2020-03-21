@@ -14,7 +14,6 @@ library(shiny)
 
 # Load in data
 setwd("../Data")
-setwd("C:/Users/Amaur/Desktop/hello-world/Data")
 BE_DR <-  read.csv("BE_DeathRate.txt", sep="")
 NL_DR <- read_excel("NL_DR.xlsx")
 FR_DR <-  read.csv("FR_DeathRate.txt", sep="")
@@ -44,7 +43,7 @@ NL_DR$Year <- as.integer(NL_DR$Year)
 FR_DR$Year <- as.integer(FR_DR$Year)
 DE_DR$Year <- as.integer(DE_DR$Year)
 WDE_DR$Year <- as.integer(WDE_DR$Year)
-USA_DR$Year <- as.integer(DE_DR$Year)
+USA_DR$Year <- as.integer(USA_DR$Year)
 
 BE <- BE_DR %>% 
   select(1,2,5) %>%
@@ -78,29 +77,42 @@ GDPC2 <- GDPC %>%
   pivot_longer(-`country name`,names_to = "year", values_to = "GDP per Capita") %>%
   filter(year >= 1900) 
 GDPC2 <- GDPC2[-1,]
+GDPC2 <- GDPC2 %>%
+  mutate(year = as.numeric(year))
 
 RealWage2 <- RealWage %>%
   pivot_longer(-`country name`, names_to = "year", values_to = "Real Wage") %>%
   filter(year >= 1900)
 RealWage2 <- RealWage2[-1,]  
 RealWage2 <- na.omit(RealWage2)
+RealWage2 <- RealWage2 %>%
+  mutate(year = as.numeric(year))
 
 Life2 <- Life %>%
   pivot_longer(-`country name`,names_to = "year", values_to = "LifeEx") %>%
   filter(year >= 1900)
 Life2 <- Life2[-1,]  
 Life2 <- na.omit(Life2)
+Life2 <- Life2 %>%
+  mutate(year = as.numeric(year))
 
 CO2 <- CO2 %>%
   pivot_longer(-`country name`,names_to = "year", values_to = "CO2") %>%
   filter(year >= 1900)
 CO2 <- CO2[-1,] 
 CO2 <- na.omit(CO2)
+CO2 <- CO2 %>%
+  mutate(year = as.numeric(year))
+
+# De colname van elke variabele moet hetzelfde heten
+colnames(Life2)[3] <- "variable"
+colnames(CO2)[3] <- "variable"
+colnames(RealWage2)[3] <- "variable"
+colnames(GDPC2)[3] <- "variable"
 
 # Shiny
 ui <- fluidPage(
-  titlePanel("GDP per Capita"),
-  
+  titlePanel("Selected variables in a pandemic"),
   sidebarLayout(
     sidebarPanel(
       selectInput("PAN", 
@@ -118,9 +130,16 @@ ui <- fluidPage(
                                           "Germany", 
                                           "Italy",
                                           "United Kingdom",
-                                          "United Sates",
+                                          "United States",
                                           "China"),
                               selected = "Belgium"),
+    selectInput("VAR",
+                label = "Choose a variable",
+                choices = c("GDP per Capita",
+                            "Real wages",
+                            "Life expectancy",
+                            "CO2 emissions"
+                            ))
     ),
     
     mainPanel(plotOutput("plot"))
@@ -141,19 +160,23 @@ datasetInput1 <- reactive({
   
 # Hier maken we een functie van de namen van landen (HIER LOOP IK VAST)
 datasetInput2 <- reactive({
-    switch(input$CT)
-  })
+  switch(input$VAR,
+         "GDP per Capita" = GDPC2,
+         "Real wages" = RealWage2,
+         "Life expectancy" = Life2,
+         "CO2 emissions" = CO2)
+})
   
   
-# Hier gaan we de data filteren als functie van de argumenten (HIER LOOP IK VAST)
+# Hier gaan we de data filteren als functie van de argumenten 
 filteredData <- reactive({
-    GDPC2[GDPC2$year %in% datasetInput1(), GDPC2$`country name` %in% datasetInput2()]
+    datasetInput2()[datasetInput2()$year %in% datasetInput1() & datasetInput2()$`country name`== input$CT,]
   })
   
 # output?  
   output$plot<-renderPlot({
-    ggplot(data = filteredData(),aes(x=date,y=`GDP per Capita`)) + 
-      geom_line() 
+    ggplot(data = filteredData(),aes(x=year,y=variable)) + 
+      geom_line() + ggtitle(paste(input$VAR,"over time"))
   })
 }
 
