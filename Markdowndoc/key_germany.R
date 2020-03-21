@@ -1,4 +1,10 @@
 library(fuzzyjoin)
+library(tidyverse)
+library(lubridate)
+
+x <- c("ggmap", "rgdal", "rgeos", "maptools", "tmap")
+lapply(x, library, character.only = TRUE)
+
 Germany <- read.csv("../Data/DE_Confirmed.csv", sep = ";") %>%
   select(-4) %>%
   mutate(dag = dmy(as.character(dag)), region = toupper(as.character(region))) 
