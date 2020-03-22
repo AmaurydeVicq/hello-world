@@ -17,6 +17,7 @@ library(readxl)
 library(rvest)
 library(tidyverse)
 library(fuzzyjoin)
+library(stringr)
 library(magrittr)
 library(leaflet)
 library(lubridate)
@@ -242,6 +243,103 @@ France <- France %>%
 
 ``` 
 
+
+## L'Italie
+
+Je vais faire pareil pour l'Italie, le pays le plus fortement frappé par le virus jusqu'à maintenant.
+
+```{r}
+#urls
+dates <- seq(from = ymd("2020-02-24"), to = today() -1, by = 1)
+dates <- format(dates,"%Y%m%d")
+
+#reading in the data
+urls <- NULL
+storage <- NULL
+final <- NULL
+for (i in dates) {
+urls[i] <- paste("https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-regioni/dpc-covid19-ita-regioni-", 
+                 i,
+                 ".csv", sep = "")
+storage <- read.csv(urls[i])
+final <- rbind(final, storage)
+}
+
+final <- final %>%
+  mutate(data = ymd(str_extract(data, "(.+)\\s")))
+  
+
+#Correspondence table with NUTS-1 Regions
+
+conversione_italia <- data.frame(NUTS_CODE = c(rep("ITC", 4), 
+                         rep("ITH",4), 
+                         rep("ITI", 4),
+                         rep("ITF", 6), 
+                         rep("ITG", 2)), 
+           denominazione_regione = c("Piemonte", 
+                                     "Valle d'Aosta",
+                                     "Liguria",
+                                     "Lombardia",
+                                     "P.A. Trento",
+                                     "Veneto",
+                                     "Friuli Venezia Giulia",
+                                     "Emilia Romagna",
+                                     "Toscana",
+                                     "Umbria",
+                                     "Marche",
+                                     "Lazio",
+                                     "Abruzzo",
+                                     "Molise",
+                                     "Campania",
+                                     "Puglia",
+                                     "Basilicata",
+                                     "Calabria",
+                                     "Sicilia",
+                                     "Sardegna"
+                                    )
+)
+
+write.csv(conversione_italia, "../Data/conversione_italia.csv")
+
+# Merge with nuts code
+final <- merge(final, conversione_italia)
+
+#Aggregate on nuts-level
+
+Italy <- final %>%
+  group_by(data, NUTS_CODE) %>%
+  summarise(montant = sum(totale_casi))
+
+colnames(Italy) <- c("Date", "NUTS_CODE", "montant")
+
+```
+
+
+## Danemark, République Tchèque, Suisse, Irlande
+
+Et maintenant quelques pays qui n'ont q'une région: le Danemark:
+
+```{r}
+
+jeveux <- c("Denmark", "Czechia", "Switzerland", "Ireland")
+conversiontable <- data.frame(NUTS_CODE = c("CZ0", "DK0", "CH0", "IE0"), Country.Region = c("Czechia","Denmark","Switzerland", "Ireland"))
+
+pays <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv") %>%
+  select(-1)
+
+finalpays <- pays %>%
+  pivot_longer(4:ncol(pays), names_to = "Date", values_to = "montant") %>%
+  mutate(Date = mdy(str_replace(Date, "X", ""))) %>%
+  filter(Country.Region %in% jeveux) %>%
+  select(-2,-3) %>%
+  merge(conversiontable) %>%
+  group_by(Country.Region, Date, NUTS_CODE) %>%
+  summarise(montant = sum(montant)) %>%
+  ungroup() %>%
+  select(NUTS_CODE, Date, montant)
+
+```
+
 Ainsi on a converti tout ce qu'il faut pour conduire une analyse géographique. 
 
 
@@ -253,13 +351,17 @@ Au commencement de ce fichier Markdown, on a paramétrisé une date specifique (
 write.csv(Netherlands, "../Data/Shiny_nl.csv")
 write.csv(Belgium, "../Data/Shiny_be.csv")
 write.csv(France, "../Data/Shiny_fr.csv")
+write.csv(Italy, "../Data/Shiny_it.csv")
+write.csv(finalpays, "../Data/Shiny_ap.csv")
 
-countries <- list(Netherlands, Belgium, France) %>%
+countries <- list(Netherlands, Belgium, France, Italy, finalpays) %>%
   lapply(filter, Date == datum)
 
 Netherlands <- countries[[1]]
 Belgium <- countries[[2]]
 France <- countries[[3]]
+Italy <- countries[[4]]
+Autrespays <- countries[[5]]
 ```
 
 Plus tard, il va y avoir un outil qui va vous permettre de spécifier une séquence de dates et de générer une visualisation du développement du virus au cours de cette période. 
@@ -280,19 +382,28 @@ Europe <- sp::merge(Europe, France, by.x = "NUTS_ID", by.y = "NUTS_CODE")
 
 Europe@data <- Europe@data %>%
   mutate(montant = ifelse(is.na(montant.x), montant.y, montant.x)) %>%
-  select(-montant.x, -montant.y)
+  select(-montant.x, -montant.y, -Date.x, -Date.y) 
 
 #Ajouter la Belgique
 Europe <- sp::merge(Europe, Belgium, by.x = "NUTS_ID", by.y = "NUTS_CODE")
 
 Europe@data <- Europe@data %>%
   mutate(montant = ifelse(is.na(montant.x), montant.y, montant.x)) %>%
-  select(-montant.x, -montant.y)
+  select(-montant.x, -montant.y, -Date)
+
+#Ajouter l'Italie
+Europe <- sp::merge(Europe, Italy, by.x = "NUTS_ID", by.y = "NUTS_CODE")
+
+Europe@data <- Europe@data %>%
+  mutate(montant = ifelse(is.na(montant.x), montant.y, montant.x)) %>%
+  select(-montant.x, -montant.y, -Date)
+
+#Ajouter les autres pays (plus tard)
 
 m1 <- tm_shape(Europe) + tm_polygons(col = "montant", 
                                palette = "viridis",
                                showNA = FALSE,
-                               breaks = c(0,50,100,200,500,1000,Inf))
+                               breaks = c(0,100,500,1000,2000,10000,Inf))
 m2 <- tmap_leaflet(m1)
 setView(m2, 4.8945, 52.3667, zoom = 5)
 
