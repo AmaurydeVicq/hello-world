@@ -21,7 +21,7 @@ library(stringr)
 library(magrittr)
 library(leaflet)
 library(lubridate)
-library(glogis)
+library(stringr)
 library(gridExtra)
 library(kableExtra)
 
@@ -314,6 +314,105 @@ colnames(Italy) <- c("Date", "NUTS_CODE", "montant")
 
 ```
 
+# L'Allemagne
+
+Auparavant, c'était difficile d'obtenir toutes les données réquiertes pour l'Allemagne, mais au final, j'ai réussi à les choper les aussi. Donc, je vais combiner deux sources différentes: une source de données collectionées manuellement, et un scrapeur, et je vais les combine àfin de montrer une vue d'ensemble de la situation. 
+
+```{r}
+# Partie 1: les donnees manuellement collectionees
+Germany <- read.csv("../Data/DE_Confirmed.csv", sep = ";") %>%
+  select(-4) %>%
+  mutate(dag = dmy(as.character(dag)), region = toupper(as.character(region))) 
+
+colnames(Germany) <- c("Date","Region","montant")
+Europe <- readOGR(layer = "NUTS_RG_03M_2016_4326_LEVL_1", dsn = "../Data")
+
+
+key <- Europe@data[10:33,c(2,4)]
+key <- key[-c(1,5,9, 18:22),] %>%
+  mutate(NUTS_NAME = as.character(NUTS_NAME))
+
+key$NUTS_NAME[key$NUTS_NAME == "MECKLENBURG-VORPOMMERN"] <- "MECKLEN-VORPOMMERN"
+#key$NUTS_NAME[key$NUTS_NAME == "THÜRINGEN"] <- "THURINGEN"
+write.csv(key, "../Data/key_germany.csv")
+Germany <- merge(Germany, key, by.x = "Region", by.y = "NUTS_NAME")
+
+Germany <- Germany %>%
+  select(NUTS_ID, Date, montant)
+
+colnames(Germany) <- c("NUTS_CODE","Date","montant")
+
+# Partie 2: Collectionner les nouvelles donnees
+#URL
+url <- "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html"
+
+Deutschland <- read_html(url) %>%
+  html_nodes('#main > div:nth-child(1) > table:nth-child(12)') %>%
+  html_table(fill = TRUE) %>%
+  as.data.frame()
+
+Deutschland <- Deutschland[-1,]
+
+date <- read_html(url) %>%
+  html_nodes("p.null") %>%
+  html_text() %>%
+  str_extract("[0-9]{2}\\.[0-9]{1,}\\.[0-9]{4}") %>%
+  dmy()
+
+Deutschland <- Deutschland %>%
+  mutate(date = date) %>%
+  select(1,2,date) %>%
+  mutate(Elektro.nisch.über.mittelte.Fälle = as.numeric(str_replace(Elektro.nisch.über.mittelte.Fälle, "\\.","")))
+
+colnames(Deutschland) <- c("Region", "montant", "Date")
+
+Deutschland <- Deutschland %>%
+  filter(Region != "Gesamt") %>%
+  select(Region, montant, Date) %>%
+  mutate(Region = toupper(Region))
+
+Deutschland[8,1] <- "MECKLEN-VORPOMMERN" #German government is retarded, 
+#invalid character in this string, so have to specify specific cell
+#Hopefully, it remains the same... 
+
+key <- read.csv("../Data/key_germany.csv") %>%
+  select(-1) %>%
+  mutate(NUTS_NAME = as.character(NUTS_NAME))
+
+Deutschland <- stringdist_left_join(Deutschland, key, by = c("Region" = "NUTS_NAME"))
+
+Deutschland <- Deutschland %>%
+  select(NUTS_ID, montant, Date)
+
+#Write one .csv per day 
+write.csv(Deutschland, paste("../Data/Deutschland_",date, ".csv", sep = ""))
+
+#Now, read all .csv's of this type:
+de_files <- dir("../Data/") 
+de_files <- de_files[grepl("Deutschland_[0-9]{4}", de_files)]
+
+Deutschland <- NULL
+
+for (i in 1:length(de_files)) {
+  a <- read.csv(paste("../Data/", de_files[i], sep = ""))
+  Deutschland <- rbind(Deutschland,a)
+}
+
+Deutschland <- Deutschland %>%
+  select(-1, NUTS_ID, montant, Date)
+
+#Change column names into correct order to merge and convert to correct classes
+Deutschland <- Deutschland[c("NUTS_ID", "Date","montant")] %>%
+  mutate(NUTS_ID = as.character(NUTS_ID), Date = as.Date(Date))
+
+colnames(Deutschland) <- c("NUTS_CODE", "Date", "montant")
+# Now, merge this dataset with the dataset already created, Germany
+Germany <- rbind(Deutschland, Germany)
+
+#La variable doit s'appeler Germany a la fin
+
+``` 
+
 
 ## Danemark, République Tchèque, Suisse, Irlande
 
@@ -353,6 +452,7 @@ write.csv(Belgium, "../Data/Shiny_be.csv")
 write.csv(France, "../Data/Shiny_fr.csv")
 write.csv(Italy, "../Data/Shiny_it.csv")
 write.csv(finalpays, "../Data/Shiny_ap.csv")
+write.csv(Germany, "../Data/Shiny_de.csv")
 
 countries <- list(Netherlands, Belgium, France, Italy, finalpays) %>%
   lapply(filter, Date == datum)
@@ -404,7 +504,7 @@ Europe@data <- Europe@data %>%
   mutate(montant = ifelse(is.na(montant.x), montant.y, montant.x)) %>%
   select(-montant.x, -montant.y, -Date)
 
-#Ajouter les autres pays (plus tard)
+#Ajouter l'Allemagne (plus tard)
 
 m1 <- tm_shape(Europe) + tm_polygons(col = "montant", 
                                palette = "viridis",
