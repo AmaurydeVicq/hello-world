@@ -398,6 +398,12 @@ Europe@data <- Europe@data %>%
   mutate(montant = ifelse(is.na(montant.x), montant.y, montant.x)) %>%
   select(-montant.x, -montant.y, -Date)
 
+Europe <- sp::merge(Europe, Autrespays, by.x = "NUTS_ID", by.y = "NUTS_CODE")
+
+Europe@data <- Europe@data %>%
+  mutate(montant = ifelse(is.na(montant.x), montant.y, montant.x)) %>%
+  select(-montant.x, -montant.y, -Date)
+
 #Ajouter les autres pays (plus tard)
 
 m1 <- tm_shape(Europe) + tm_polygons(col = "montant", 
