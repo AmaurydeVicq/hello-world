@@ -1,0 +1,185 @@
+---
+title: "Hallo Amaury"
+author: "Bas Machielsen"
+date: "3/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Hallo Amaury
+
+Hier gaan we werken aan de coronavirus database om te voorspellen. Eens even kijken waar we wat data vandaan kunnen plukken! 
+
+
+## Packages
+
+On va charger les packages!!!! 
+
+```{r include = FALSE, message = FALSE, warning = FALSE}
+library(readxl)
+library(rvest)
+library(tidyverse)
+library(fuzzyjoin)
+library(magrittr)
+library(lubridate)
+library(glogis)
+library(gridExtra)
+
+
+x <- c("ggmap", "rgdal", "rgeos", "maptools", "tmap")
+lapply(x, library, character.only = TRUE)
+```
+
+Hier eerst drie datasets van <https://github.com/CSSEGISandData/COVID-19>. 
+
+```{r}
+Confirmed <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv", colClasses = )
+
+Deaths <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv")
+
+Recovered <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv")
+```
+
+Nettoyons les données!
+
+```{r cars}
+Corona <- list(Confirmed, Deaths, Recovered)
+
+a <- ncol(Confirmed)
+#On va le pivoter
+Corona <- lapply(Corona, pivot_longer, 5:a)
+
+#Change the date strings to real dates
+Analysis <- lapply(Corona, mutate, name = str_replace(name, "X", ""))
+Analysis <- lapply(Analysis, mutate, name = mdy(name))
+
+```
+
+
+```{r}
+Alltogether <- merge(Analysis[[1]], Analysis[[2]], 
+              by = c('Province.State', 
+                     'Country.Region', 
+                     'Long', 
+                     'Lat', 
+                     'name'))
+
+Alltogether <- merge(Alltogether, Analysis[[3]], 
+              by = c('Province.State', 
+                     'Country.Region', 
+                     'Long', 
+                     'Lat', 
+                     'name'))
+
+
+names(Alltogether)[6:8] <- c("Confirmed", "Deaths", "Recovered")
+
+PerCountry <- Alltogether %>%
+  group_by(Country.Region, name) %>%
+  summarise(Confirmed = sum(Confirmed), 
+            Deaths = sum(Deaths), 
+            Recovered = sum(Recovered)) 
+
+
+PerCountry <- PerCountry %>%
+  ungroup(Country.Region) %>%
+  mutate(Country.Region = as.character(Country.Region))
+
+PerCountry$Country.Region[PerCountry$Country.Region == "US"] <- "United States"
+
+firstday <- PerCountry %>%
+  group_by(Country.Region) %>%
+  filter(Confirmed > 0) %>%
+  mutate(firstday = min(name)) %>%
+  select(Country.Region, firstday) %>%
+  distinct()
+
+PerCountry <- merge(PerCountry, firstday)
+
+PerCountry <- PerCountry %>%
+  mutate(sincefirstday = name - firstday)
+
+#1 Log-Model
+
+gf <- PerCountry %>%
+filter(sincefirstday >0,
+       Country.Region == "Italy") %>%
+  select(Deaths, sincefirstday) %>%
+  arrange(sincefirstday) %>%
+  mutate(sincefirstday = as.numeric(sincefirstday))
+
+gf %>%
+  mutate()
+
+glm_simple <-glm(data = gf, Deaths ~ sincefirstday, family = poisson(link = "log"))
+
+#2 Andere-modellen
+# Toepassing SSasymy op CH
+CHConfirmed <- subset(PerCountry, Country.Region == "China", select = c("name", "Confirmed"))
+BEConfirmed <- subset(PerCountry, Country.Region == "Belgium", select = c("name", "Confirmed"))
+NLConfirmed <- subset(PerCountry, Country.Region == "Netherlands", select = c("name", "Confirmed"))
+
+## Data variabele omzetten naar integer (werk niet met data)
+DaysPassed <- seq(1:59)
+CH <- cbind(CHConfirmed, DaysPassed)
+CH <- select(CH,2:3)     
+BE <- cbind(BEConfirmed, DaysPassed)
+BE <- select(BE,2:3) 
+NL <- cbind(NLConfirmed, DaysPassed)
+NL <- select(NL,2:3) 
+
+## Model toepassen en plotten 
+ggplot(data=CH, aes(x=DaysPassed, y=Confirmed)) +
+geom_point() +
+geom_smooth(color="Blue", se=T) +
+geom_smooth(method="nls", formula=y~SSasymp(x, Asym, R0, lrc), color="red", se=F, fullrange=T) +
+scale_x_continuous(limits=c(0,100)) + ggtitle("China")
+
+ggplot(data=BE, aes(x=DaysPassed, y=Confirmed)) +
+geom_point() +
+geom_smooth(color="Blue", se=T) +
+geom_smooth(method="nls", formula=y~SSasymp(x, Asym, R0, lrc), color="red", se=F, fullrange=T) +
+scale_x_continuous(limits=c(0,100)) + ggtitle("Belgium")
+
+ggplot(data=NL, aes(x=DaysPassed, y=Confirmed)) +
+geom_point() +
+geom_smooth(color="Blue", se=T) +
+geom_smooth(method="nls", formula=y~SSasymp(x, Asym, R0, lrc), color="red", se=F, fullrange=T) +
+scale_x_continuous(limits=c(0,100)) + ggtitle("Netherlands")
+
+
+# Toepassing TBATS op BE: 30 en 60 dagen
+
+BEConfirmed <- subset(PerCountry, Country.Region == "Belgium", select = c("name", "Confirmed"))
+
+BEL30T <- BEConfirmed %>%
+select(2) %>%
+ts() %>%
+tbats() %>%
+forecast(h = 30)
+
+BEL60T <- BEConfirmed %>%
+select(2) %>%
+ts() %>%
+tbats() %>%
+forecast(h = 60)
+
+
+# Toepassing TBATS op NL: 30 en 60 dagen
+
+NLConfirmed <- subset(PerCountry, Country.Region == "Netherlands", select = c("name", "Confirmed"))
+
+NL30 <- NLConfirmed %>%
+select(2) %>%
+ts() %>%
+tbats() %>%
+forecast(h = 30)
+
+NL60 <- NLConfirmed %>%
+select(2) %>%
+ts() %>%
+tbats() %>%
+forecast(h = 60)
