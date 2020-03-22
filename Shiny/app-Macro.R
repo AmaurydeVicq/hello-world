@@ -1,4 +1,4 @@
-# Effects of Pandemics on Financial Crises
+# Effects of Pandemics on Socio-Economic Indicators
 
 # Load packages
 library(dplyr)
@@ -36,41 +36,6 @@ HongKongFlu <- seq(1960,1970,1)
 RussianFlu <-seq(1970,1980,1)
 SwineFlu <- seq(2000,2010,1)
 countries <- c("Belgium", "Netherlands", "France", "United Kingdom", "United States", "China", "Germany", "Italy")
-
-# Amend Mortality data
-BE_DR$Year <- as.integer(BE_DR$Year) 
-NL_DR$Year <- as.integer(NL_DR$Year)
-FR_DR$Year <- as.integer(FR_DR$Year)
-DE_DR$Year <- as.integer(DE_DR$Year)
-WDE_DR$Year <- as.integer(WDE_DR$Year)
-USA_DR$Year <- as.integer(USA_DR$Year)
-
-BE <- BE_DR %>% 
-  select(1,2,5) %>%
-  mutate(country = "Belgium", Age = as.numeric(as.character(Age)), Total = as.numeric(as.character(Total)))
-
-NL <- NL_DR %>%
-  select(1,2,5) %>%
-  mutate(country = "Netherlands", Age = as.numeric(as.character(Age)), Total = as.numeric(as.character(Total)))
-
-FR <- FR_DR %>% 
-  select(1,2,5) %>%
-  mutate(country = "France", Age = as.numeric(as.character(Age)), Total = as.numeric(as.character(Total)))
-
-DE <- DE_DR %>%
-  select(1,2,5) %>%
-  mutate(country = "Germany", Age = as.numeric(as.character(Age)), Total = as.numeric(as.character(Total)))
-
-WDE <- WDE_DR %>%
-  select(1,2,5) %>%
-  mutate(country = "West-Germany", Age = as.numeric(as.character(Age)), Total = as.numeric(as.character(Total)))
-
-USA <- USA_DR %>% 
-  select(1,2,5) %>%
-  mutate(country = "United States", Age = as.numeric(as.character(Age)), Total = as.numeric(as.character(Total)))
-
-All <- rbind(BE,NL,FR,DE, WDE, USA)
-All <- na.omit(All)
 
 # Amend other data
 GDPC2 <- GDPC %>% 
@@ -112,7 +77,7 @@ colnames(GDPC2)[3] <- "variable"
 
 # Shiny
 ui <- fluidPage(
-  titlePanel("Selected variables in a pandemic"),
+  titlePanel("Effect of Pandemics on Socio-Economic Indicators"),
   sidebarLayout(
     sidebarPanel(
       selectInput("PAN", 
@@ -158,7 +123,7 @@ datasetInput1 <- reactive({
            "Russian Flu" = RussianFlu)
   })
   
-# Hier maken we een functie van de namen van landen (HIER LOOP IK VAST)
+# Hier maken we een functie van de namen van landen 
 datasetInput2 <- reactive({
   switch(input$VAR,
          "GDP per Capita" = GDPC2,
@@ -166,7 +131,17 @@ datasetInput2 <- reactive({
          "Life expectancy" = Life2,
          "CO2 emissions" = CO2)
 })
-  
+
+# Hier maken we een functie voor de verticale geoms
+geomlineInput <- reactive({
+  switch(input$PAN,
+         "Spanish Flu" = c(1918:1920),
+         "Asian Flu" = c(1954:1956),
+         "Hong Kong Flu" = c(1962:1964),
+         "Russian Flu" = c(1971:1973)
+  )
+})
+
   
 # Hier gaan we de data filteren als functie van de argumenten 
 filteredData <- reactive({
@@ -176,7 +151,9 @@ filteredData <- reactive({
 # output?  
   output$plot<-renderPlot({
     ggplot(data = filteredData(),aes(x=year,y=variable)) + 
-      geom_line() + ggtitle(paste(input$VAR,"over time"))
+      geom_line() + ggtitle(paste(input$VAR,"over time")) +
+      geom_vline(xintercept = geomlineInput()[1], linetype = "dashed", colour = "red") +
+      geom_vline(xintercept = geomlineInput()[2], linetype = "dashed", colour = "red")
   })
 }
 
