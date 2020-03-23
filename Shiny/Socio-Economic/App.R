@@ -9,18 +9,17 @@ library(ggplot2)
 library(tidyr)
 library(readr)
 library(lubridate)
-library(scales)ru
+library(scales)
 library(shiny)
 library(rsconnect)
 
 # Load in data
-setwd("../Shiny/Socio-Economic")
-GDPC <- read_excel("GDPperCapita.xlsx")
-Life <- read_excel("Life.xlsx")
-BondYield <- read_excel("BondYield.xlsx")
-RealWage <- read_excel("RealWage.xlsx")
-Debt <- read_excel("Debt.xlsx")
-CO2 <- read_excel("CO2.xlsx")
+GDPC <- read_excel("./Data/GDPperCapita.xlsx")
+#Life <- read_excel("./Data/Life.xlsx")
+BondYield <- read_excel("./Data/BondYield.xlsx")
+RealWage <- read_excel("./Data/RealWage.xlsx")
+Debt <- read_excel("./Data/Debt.xlsx")
+CO2 <- read_excel("./Data/CO2.xlsx")
 
 # Flus & countries
 SpanishFlu <- seq(1900,1930,1)

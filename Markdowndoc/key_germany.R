@@ -19,7 +19,7 @@ key <- key[-c(1,5,9, 18:22),] %>%
 
 key$NUTS_NAME[key$NUTS_NAME == "MECKLENBURG-VORPOMMERN"] <- "MECKLEN-VORPOMMERN"
 #key$NUTS_NAME[key$NUTS_NAME == "THÜRINGEN"] <- "THURINGEN"
-
+write.csv(key, "../Data/key_germany.csv")
 Germany <- merge(Germany, key, by.x = "Region", by.y = "NUTS_NAME")
 
 Germany <- Germany %>%
