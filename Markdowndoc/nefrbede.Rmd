@@ -45,8 +45,13 @@ On va utiliser plusieurs sources qui nous sont disponibles.
 ```{r}
 #Importer les données françaises via cet URL:
 France <- read.csv("https://www.data.gouv.fr/fr/datasets/r/fa9b8fc8-35d5-4e24-90eb-9abe586b0fa5",header = TRUE, check.names = F)
+
+#Filtrer les observations valides
+France <- filter_all(France, all_vars(!grepl("\\*",.))) %>%
+  mutate_at(2:ncol(France), as.numeric)
+
 France <- France %>%
-  pivot_longer(2:ncol(France), 
+  pivot_longer(2:21, 
                names_to = "departement", 
                values_to = "montant") %>%
   mutate(Date = ymd(Date))
