@@ -9,19 +9,12 @@ library(ggplot2)
 library(tidyr)
 library(readr)
 library(lubridate)
-library(scales)
+library(scales)ru
 library(shiny)
+library(rsconnect)
 
 # Load in data
-setwd("../Data")
-BE_DR <-  read.csv("BE_DeathRate.txt", sep="")
-NL_DR <- read_excel("NL_DR.xlsx")
-FR_DR <-  read.csv("FR_DeathRate.txt", sep="")
-DE_DR <-  read.csv("DE_DeathRate.txt", sep="")
-WDE_DR <-  read.csv("WestDE_DeathRate.txt", sep="")
-USA_DR <-  read.csv("USA_DeathRate.txt", sep="")
-SPC <- read_excel("SPC.xlsx")
-AEX <- read_excel("AEX.xlsx")
+setwd("../Shiny/Socio-Economic")
 GDPC <- read_excel("GDPperCapita.xlsx")
 Life <- read_excel("Life.xlsx")
 BondYield <- read_excel("BondYield.xlsx")
@@ -160,3 +153,4 @@ filteredData <- reactive({
 
 # launch app
 shinyApp(ui, server)
+
