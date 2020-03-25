@@ -271,13 +271,13 @@ final <- rbind(final, storage)
 }
 
 final <- final %>%
-  mutate(data = ymd(str_extract(data, "(.+)\\s")))
+  mutate(data = ymd(str_extract(data, "(.+)T")))
   
 
 #Correspondence table with NUTS-1 Regions
 
 conversione_italia <- data.frame(NUTS_CODE = c(rep("ITC", 4), 
-                         rep("ITH",4), 
+                         rep("ITH",5), 
                          rep("ITI", 4),
                          rep("ITF", 6), 
                          rep("ITG", 2)), 
@@ -285,6 +285,7 @@ conversione_italia <- data.frame(NUTS_CODE = c(rep("ITC", 4),
                                      "Valle d'Aosta",
                                      "Liguria",
                                      "Lombardia",
+                                     "P.A. Bolzano",
                                      "P.A. Trento",
                                      "Veneto",
                                      "Friuli Venezia Giulia",
