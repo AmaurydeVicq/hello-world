@@ -1,0 +1,23 @@
+﻿date;country;region;LD full;LD partial;bars/shops;teleworking;firms closed;sports forbidden;schools;source
+14/03/2020;Spain;all;1;;;;;;;
+14/03/2020;France;all;;;1;1;;;;
+21/03/2020;Italy;all;;;;;1;;;https://www.nrc.nl/nieuws/2020/03/21/coronablog-22-maart-a3994527
+21/03/2020;Italy;Lombardije;;;;;;1;;
+17/03/2020;France;all;1;;;;;;;
+24/03/2020;Brazil;Sao Paulo;;;1;;1;1;;https://www.nrc.nl/nieuws/2020/03/20/coronablog-21-maart-a3994494
+20/03/2020;UK;all;;;1;;;;1;https://www.nrc.nl/nieuws/2020/03/20/coronablog-21-maart-a3994494
+21/03/2020;Colombia;all;1;;;;;;;https://www.nrc.nl/nieuws/2020/03/20/coronablog-21-maart-a3994494
+21/03/2020;US;New York;1;;;;;;;
+21/03/2020;US;Illinois;1;;;;;;;
+21/03/2020;US;New Jersey;1;;;;;;;
+18/03/2020;Belgium;;1;;;;;;;https://www.nrc.nl/nieuws/2020/03/17/coronablog-17-maart-a3993977
+17/03/2020;Greece;;;1;;;;;;https://www.nrc.nl/nieuws/2020/03/17/coronablog-17-maart-a3993977
+17/03/2020;Venezuela;;1;;;;;;;https://www.nrc.nl/nieuws/2020/03/17/coronablog-17-maart-a3993977
+16/03/2020;German;;;;1;;;;;https://www.nrc.nl/nieuws/2020/03/15/coronablog-16-maart-a3993869
+17/03/2020;UK;;;1;;;;;0;https://www.nrc.nl/nieuws/2020/03/15/coronablog-16-maart-a3993869
+16/03/2020;Malaysia;;;;1;;;;1;https://www.nrc.nl/nieuws/2020/03/15/coronablog-16-maart-a3993869
+16/03/2020;Hungary;;;;0,5;;;;;https://www.nrc.nl/nieuws/2020/03/15/coronablog-16-maart-a3993869
+16/03/2020;US;New York;;;;;;;;
+;;Los Angeles;;;1;;;;;
+;;;;;;;;;;
+;;;;;;;;;;https://www.nrc.nl/nieuws/2020/03/14/coronablog-15-maart-a3993807
