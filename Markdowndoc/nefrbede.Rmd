@@ -511,12 +511,12 @@ Europe@data <- Europe@data %>%
 
 #Ajouter l'Allemagne (plus tard)
 
-m1 <- tm_shape(Europe) + tm_polygons(col = "montant", 
-                               palette = "viridis",
-                               showNA = FALSE,
-                               breaks = c(0,100,500,1000,2000,10000,Inf))
-m2 <- tmap_leaflet(m1)
-setView(m2, 4.8945, 52.3667, zoom = 5)
+#m1 <- tm_shape(Europe) + tm_polygons(col = "montant", 
+#                               palette = "viridis",
+#                               showNA = FALSE,
+#                               breaks = c(0,100,500,1000,2000,10000,Inf))
+#m2 <- tmap_leaflet(m1)
+#setView(m2, 4.8945, 52.3667, zoom = 5)
 
 ```
 
