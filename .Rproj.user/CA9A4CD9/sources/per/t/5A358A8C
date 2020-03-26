@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1585221878094.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "5A358A8C",
+    "lastKnownWriteTime" : 8319104478871053602,
+    "last_content_update" : 1585221878094,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "22C6E03F",
+        "caption" : "montantBE",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=montantBE&cache_key=22C6E03F",
+        "displayedObservations" : 78,
+        "environment" : "",
+        "expression" : "montantBE",
+        "object" : "montantBE",
+        "preview" : 0,
+        "totalObservations" : 78,
+        "variables" : 4
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
