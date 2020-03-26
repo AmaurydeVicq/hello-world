@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1585167153670.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "CFF3A759",
+    "lastKnownWriteTime" : 8319104478871053602,
+    "last_content_update" : 1585167153670,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "2FDEADE8",
+        "caption" : "montantNL",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=montantNL&cache_key=2FDEADE8",
+        "displayedObservations" : "76",
+        "environment" : "",
+        "expression" : "montantNL",
+        "object" : "montantNL",
+        "preview" : "0",
+        "totalObservations" : "76",
+        "variables" : "4"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
