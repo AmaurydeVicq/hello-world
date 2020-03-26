@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1584398627473.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "8AF78E32",
+    "lastKnownWriteTime" : 1584398340,
+    "last_content_update" : 1584398627473,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "D82BDB15",
+        "caption" : "Crisis2020",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=Crisis2020&cache_key=D82BDB15",
+        "displayedObservations" : 15,
+        "environment" : "",
+        "expression" : "Crisis2020",
+        "object" : "Crisis2020",
+        "preview" : 0,
+        "totalObservations" : 15,
+        "variables" : 2
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

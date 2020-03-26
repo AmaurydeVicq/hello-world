@@ -21,13 +21,14 @@ montantBE <- read.csv("Belgique.csv")
 montantNL <- read.csv("Shiny_nl.csv")
 
 
-montantBE[c("lnmontant")] <- ln(deathBE[c("montant")])
+montantBE[c("lnmontant")] <- ln(montantBE[c("montant")])
 montantNL[c("lnmontant")] <- ln(montantNL[c("montant")])
 
 
 ggplot(data=montantBE, aes(x=Date, y=lnmontant, group=NUTS_CODE)) +
   geom_line(aes(linetype=NUTS_CODE))+
-  geom_point() 
+  geom_point() +
+  labs(title = "Belgium logarithmic scale")
 
 ggplot(data=montantBE, aes(x=Date, y=montant, group=NUTS_CODE)) +
   geom_line(aes(linetype=NUTS_CODE))+
@@ -35,7 +36,9 @@ ggplot(data=montantBE, aes(x=Date, y=montant, group=NUTS_CODE)) +
 
 ggplot(data=montantNL, aes(x=Date, y=lnmontant, group=NUTS)) +
   geom_line(aes(linetype=NUTS))+
-  geom_point() 
+  geom_point() +
+  labs(title = "The Netherlands logarithmic scale")
+
 
 ggplot(data=montantNL, aes(x=Date, y=montant, group=NUTS)) +
   geom_line(aes(linetype=NUTS))+

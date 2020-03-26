@@ -15,7 +15,7 @@ library(rsconnect)
 
 # Load in data
 GDPC <- read_excel("./Data/GDPperCapita.xlsx")
-#Life <- read_excel("./Data/Life.xlsx")
+Life <- read_excel("./Data/Life.xlsx")
 BondYield <- read_excel("./Data/BondYield.xlsx")
 RealWage <- read_excel("./Data/RealWage.xlsx")
 Debt <- read_excel("./Data/Debt.xlsx")

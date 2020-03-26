@@ -271,13 +271,13 @@ final <- rbind(final, storage)
 }
 
 final <- final %>%
-  mutate(data = ymd(str_extract(data, "(.+)\\s")))
+  mutate(data = ymd(str_extract(data, "(.+)T")))
   
 
 #Correspondence table with NUTS-1 Regions
 
 conversione_italia <- data.frame(NUTS_CODE = c(rep("ITC", 4), 
-                         rep("ITH",4), 
+                         rep("ITH",5), 
                          rep("ITI", 4),
                          rep("ITF", 6), 
                          rep("ITG", 2)), 
@@ -285,6 +285,7 @@ conversione_italia <- data.frame(NUTS_CODE = c(rep("ITC", 4),
                                      "Valle d'Aosta",
                                      "Liguria",
                                      "Lombardia",
+                                     "P.A. Bolzano",
                                      "P.A. Trento",
                                      "Veneto",
                                      "Friuli Venezia Giulia",
@@ -511,12 +512,12 @@ Europe@data <- Europe@data %>%
 
 #Ajouter l'Allemagne (plus tard)
 
-m1 <- tm_shape(Europe) + tm_polygons(col = "montant", 
-                               palette = "viridis",
-                               showNA = FALSE,
-                               breaks = c(0,100,500,1000,2000,10000,Inf))
-m2 <- tmap_leaflet(m1)
-setView(m2, 4.8945, 52.3667, zoom = 5)
+#m1 <- tm_shape(Europe) + tm_polygons(col = "montant", 
+#                               palette = "viridis",
+#                               showNA = FALSE,
+#                               breaks = c(0,100,500,1000,2000,10000,Inf))
+#m2 <- tmap_leaflet(m1)
+#setView(m2, 4.8945, 52.3667, zoom = 5)
 
 ```
 

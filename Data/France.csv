@@ -5,7 +5,7 @@
 "4",2020-03-04,"Centre-Val de Loire",0
 "5",2020-03-04,"Corse",0
 "6",2020-03-04,"Grand Est",38
-"7",2020-03-04,"Hauts-de-France",10
+"7",2020-03-04,"Hauts-de-France",65
 "8",2020-03-04,"Ile-de-France",55
 "9",2020-03-04,"Normandie",2
 "10",2020-03-04,"Nouvelle-Aquitaine",5
@@ -25,7 +25,7 @@
 "24",2020-03-05,"Centre-Val de Loire",2
 "25",2020-03-05,"Corse",3
 "26",2020-03-05,"Grand Est",77
-"27",2020-03-05,"Hauts-de-France",13
+"27",2020-03-05,"Hauts-de-France",74
 "28",2020-03-05,"Ile-de-France",76
 "29",2020-03-05,"Normandie",6
 "30",2020-03-05,"Nouvelle-Aquitaine",8
@@ -45,7 +45,7 @@
 "44",2020-03-06,"Centre-Val de Loire",11
 "45",2020-03-06,"Corse",3
 "46",2020-03-06,"Grand Est",136
-"47",2020-03-06,"Hauts-de-France",18
+"47",2020-03-06,"Hauts-de-France",97
 "48",2020-03-06,"Ile-de-France",89
 "49",2020-03-06,"Normandie",11
 "50",2020-03-06,"Nouvelle-Aquitaine",11
@@ -65,7 +65,7 @@
 "64",2020-03-07,"Centre-Val de Loire",16
 "65",2020-03-07,"Corse",5
 "66",2020-03-07,"Grand Est",250
-"67",2020-03-07,"Hauts-de-France",1
+"67",2020-03-07,"Hauts-de-France",173
 "68",2020-03-07,"Ile-de-France",104
 "69",2020-03-07,"Normandie",11
 "70",2020-03-07,"Nouvelle-Aquitaine",17
@@ -85,7 +85,7 @@
 "84",2020-03-10,"Centre-Val de Loire",19
 "85",2020-03-10,"Corse",42
 "86",2020-03-10,"Grand Est",489
-"87",2020-03-10,"Hauts-de-France",2
+"87",2020-03-10,"Hauts-de-France",249
 "88",2020-03-10,"Ile-de-France",468
 "89",2020-03-10,"Normandie",40
 "90",2020-03-10,"Nouvelle-Aquitaine",57
@@ -105,7 +105,7 @@
 "104",2020-03-11,"Centre-Val de Loire",20
 "105",2020-03-11,"Corse",51
 "106",2020-03-11,"Grand Est",578
-"107",2020-03-11,"Hauts-de-France",3
+"107",2020-03-11,"Hauts-de-France",263
 "108",2020-03-11,"Ile-de-France",492
 "109",2020-03-11,"Normandie",54
 "110",2020-03-11,"Nouvelle-Aquitaine",66
@@ -125,7 +125,7 @@
 "124",2020-03-12,"Centre-Val de Loire",30
 "125",2020-03-12,"Corse",64
 "126",2020-03-12,"Grand Est",699
-"127",2020-03-12,"Hauts-de-France",4
+"127",2020-03-12,"Hauts-de-France",349
 "128",2020-03-12,"Ile-de-France",577
 "129",2020-03-12,"Normandie",68
 "130",2020-03-12,"Nouvelle-Aquitaine",87
@@ -145,7 +145,7 @@
 "144",2020-03-13,"Centre-Val de Loire",33
 "145",2020-03-13,"Corse",85
 "146",2020-03-13,"Grand Est",911
-"147",2020-03-13,"Hauts-de-France",5
+"147",2020-03-13,"Hauts-de-France",397
 "148",2020-03-13,"Ile-de-France",721
 "149",2020-03-13,"Normandie",97
 "150",2020-03-13,"Nouvelle-Aquitaine",114
@@ -165,7 +165,7 @@
 "164",2020-03-14,"Centre-Val de Loire",54
 "165",2020-03-14,"Corse",106
 "166",2020-03-14,"Grand Est",1085
-"167",2020-03-14,"Hauts-de-France",6
+"167",2020-03-14,"Hauts-de-France",466
 "168",2020-03-14,"Ile-de-France",949
 "169",2020-03-14,"Normandie",127
 "170",2020-03-14,"Nouvelle-Aquitaine",130
@@ -185,7 +185,7 @@
 "184",2020-03-15,"Centre-Val de Loire",71
 "185",2020-03-15,"Corse",115
 "186",2020-03-15,"Grand Est",1378
-"187",2020-03-15,"Hauts-de-France",7
+"187",2020-03-15,"Hauts-de-France",507
 "188",2020-03-15,"Ile-de-France",1209
 "189",2020-03-15,"Normandie",143
 "190",2020-03-15,"Nouvelle-Aquitaine",144
@@ -205,7 +205,7 @@
 "204",2020-03-16,"Centre-Val de Loire",90
 "205",2020-03-16,"Corse",126
 "206",2020-03-16,"Grand Est",1543
-"207",2020-03-16,"Hauts-de-France",8
+"207",2020-03-16,"Hauts-de-France",585
 "208",2020-03-16,"Ile-de-France",1762
 "209",2020-03-16,"Normandie",156
 "210",2020-03-16,"Nouvelle-Aquitaine",178
@@ -225,7 +225,7 @@
 "224",2020-03-17,"Centre-Val de Loire",103
 "225",2020-03-17,"Corse",145
 "226",2020-03-17,"Grand Est",1820
-"227",2020-03-17,"Hauts-de-France",9
+"227",2020-03-17,"Hauts-de-France",612
 "228",2020-03-17,"Ile-de-France",2177
 "229",2020-03-17,"Normandie",174
 "230",2020-03-17,"Nouvelle-Aquitaine",200
@@ -245,7 +245,7 @@
 "244",2020-03-18,"Centre-Val de Loire",128
 "245",2020-03-18,"Corse",152
 "246",2020-03-18,"Grand Est",2163
-"247",2020-03-18,"Hauts-de-France",11
+"247",2020-03-18,"Hauts-de-France",665
 "248",2020-03-18,"Ile-de-France",2693
 "249",2020-03-18,"Normandie",208
 "250",2020-03-18,"Nouvelle-Aquitaine",237
@@ -265,7 +265,7 @@
 "264",2020-03-19,"Centre-Val de Loire",157
 "265",2020-03-19,"Corse",162
 "266",2020-03-19,"Grand Est",2643
-"267",2020-03-19,"Hauts-de-France",12
+"267",2020-03-19,"Hauts-de-France",700
 "268",2020-03-19,"Ile-de-France",3384
 "269",2020-03-19,"Normandie",241
 "270",2020-03-19,"Nouvelle-Aquitaine",280
@@ -285,7 +285,7 @@
 "284",2020-03-20,"Centre-Val de Loire",219
 "285",2020-03-20,"Corse",168
 "286",2020-03-20,"Grand Est",3006
-"287",2020-03-20,"Hauts-de-France",14
+"287",2020-03-20,"Hauts-de-France",759
 "288",2020-03-20,"Ile-de-France",3818
 "289",2020-03-20,"Normandie",287
 "290",2020-03-20,"Nouvelle-Aquitaine",432
@@ -305,7 +305,7 @@
 "304",2020-03-21,"Centre-Val de Loire",254
 "305",2020-03-21,"Corse",173
 "306",2020-03-21,"Grand Est",3089
-"307",2020-03-21,"Hauts-de-France",15
+"307",2020-03-21,"Hauts-de-France",791
 "308",2020-03-21,"Ile-de-France",4695
 "309",2020-03-21,"Normandie",345
 "310",2020-03-21,"Nouvelle-Aquitaine",521
@@ -325,7 +325,7 @@
 "324",2020-03-22,"Centre-Val de Loire",291
 "325",2020-03-22,"Corse",183
 "326",2020-03-22,"Grand Est",3395
-"327",2020-03-22,"Hauts-de-France",17
+"327",2020-03-22,"Hauts-de-France",936
 "328",2020-03-22,"Ile-de-France",5283
 "329",2020-03-22,"Normandie",462
 "330",2020-03-22,"Nouvelle-Aquitaine",612
@@ -339,3 +339,83 @@
 "338",2020-03-22,"Martinique",44
 "339",2020-03-22,"Mayotte",14
 "340",2020-03-22,"La Réunion",64
+"341",2020-03-23,"Auvergne-Rhône-Alpes",1730
+"342",2020-03-23,"Bourgogne-Franche-Comté",1347
+"343",2020-03-23,"Bretagne",490
+"344",2020-03-23,"Centre-Val de Loire",361
+"345",2020-03-23,"Corse",194
+"346",2020-03-23,"Grand Est",4256
+"347",2020-03-23,"Hauts-de-France",1269
+"348",2020-03-23,"Ile-de-France",6211
+"349",2020-03-23,"Normandie",511
+"350",2020-03-23,"Nouvelle-Aquitaine",676
+"351",2020-03-23,"Occitanie",767
+"352",2020-03-23,"Pays de la Loire",293
+"353",2020-03-23,"Provence-Alpes-Côte d’Azur",1510
+"354",2020-03-23,"Guadeloupe",62
+"355",2020-03-23,"Saint-Barthélémy",3
+"356",2020-03-23,"Saint-Martin",8
+"357",2020-03-23,"Guyane",20
+"358",2020-03-23,"Martinique",53
+"359",2020-03-23,"Mayotte",24
+"360",2020-03-23,"La Réunion",71
+"361",2020-03-24,"Auvergne-Rhône-Alpes",1857
+"362",2020-03-24,"Bourgogne-Franche-Comté",1510
+"363",2020-03-24,"Bretagne",526
+"364",2020-03-24,"Centre-Val de Loire",450
+"365",2020-03-24,"Corse",217
+"366",2020-03-24,"Grand Est",4922
+"367",2020-03-24,"Hauts-de-France",1532
+"368",2020-03-24,"Ile-de-France",6798
+"369",2020-03-24,"Normandie",586
+"370",2020-03-24,"Nouvelle-Aquitaine",789
+"371",2020-03-24,"Occitanie",900
+"372",2020-03-24,"Pays de la Loire",343
+"373",2020-03-24,"Provence-Alpes-Côte d’Azur",1595
+"374",2020-03-24,"Guadeloupe",73
+"375",2020-03-24,"Saint-Barthélémy",3
+"376",2020-03-24,"Saint-Martin",8
+"377",2020-03-24,"Guyane",23
+"378",2020-03-24,"Martinique",57
+"379",2020-03-24,"Mayotte",30
+"380",2020-03-24,"La Réunion",83
+"381",2020-03-25,"Auvergne-Rhône-Alpes",2093
+"382",2020-03-25,"Bourgogne-Franche-Comté",1569
+"383",2020-03-25,"Bretagne",603
+"384",2020-03-25,"Centre-Val de Loire",561
+"385",2020-03-25,"Corse",225
+"386",2020-03-25,"Grand Est",5479
+"387",2020-03-25,"Hauts-de-France",1753
+"388",2020-03-25,"Ile-de-France",7660
+"389",2020-03-25,"Normandie",688
+"390",2020-03-25,"Nouvelle-Aquitaine",912
+"391",2020-03-25,"Occitanie",1082
+"392",2020-03-25,"Pays de la Loire",368
+"393",2020-03-25,"Provence-Alpes-Côte d’Azur",1927
+"394",2020-03-25,"Guadeloupe",76
+"395",2020-03-25,"Saint-Barthélémy",3
+"396",2020-03-25,"Saint-Martin",11
+"397",2020-03-25,"Guyane",28
+"398",2020-03-25,"Martinique",66
+"399",2020-03-25,"Mayotte",35
+"400",2020-03-25,"La Réunion",94
+"401",NA,"Auvergne-Rhône-Alpes",NA
+"402",NA,"Bourgogne-Franche-Comté",NA
+"403",NA,"Bretagne",NA
+"404",NA,"Centre-Val de Loire",NA
+"405",NA,"Corse",NA
+"406",NA,"Grand Est",NA
+"407",NA,"Hauts-de-France",NA
+"408",NA,"Ile-de-France",NA
+"409",NA,"Normandie",NA
+"410",NA,"Nouvelle-Aquitaine",NA
+"411",NA,"Occitanie",NA
+"412",NA,"Pays de la Loire",NA
+"413",NA,"Provence-Alpes-Côte d’Azur",NA
+"414",NA,"Guadeloupe",NA
+"415",NA,"Saint-Barthélémy",NA
+"416",NA,"Saint-Martin",NA
+"417",NA,"Guyane",NA
+"418",NA,"Martinique",NA
+"419",NA,"Mayotte",NA
+"420",NA,"La Réunion",NA
