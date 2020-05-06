@@ -353,14 +353,14 @@ colnames(Germany) <- c("NUTS_CODE","Date","montant")
 url <- "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html"
 
 Deutschland <- read_html(url) %>%
-  html_nodes('#main > div:nth-child(1) > table:nth-child(12)') %>%
+  html_nodes('.textBox > div:nth-child(1) > table:nth-child(4)') %>%
   html_table(fill = TRUE) %>%
   as.data.frame()
 
 Deutschland <- Deutschland[-1,]
 
 date <- read_html(url) %>%
-  html_nodes("p.null") %>%
+  html_nodes(".textBox > div:nth-child(1) > p:nth-child(3)") %>%
   html_text() %>%
   str_extract("[0-9]{2}\\.[0-9]{1,}\\.[0-9]{4}") %>%
   dmy()
@@ -429,7 +429,7 @@ Et maintenant quelques pays qui n'ont q'une région: le Danemark:
 jeveux <- c("Denmark", "Czechia", "Switzerland", "Ireland")
 conversiontable <- data.frame(NUTS_CODE = c("CZ0", "DK0", "CH0", "IE0"), Country.Region = c("Czechia","Denmark","Switzerland", "Ireland"))
 
-pays <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv") %>%
+pays <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv") %>%
   select(-1)
 
 finalpays <- pays %>%
